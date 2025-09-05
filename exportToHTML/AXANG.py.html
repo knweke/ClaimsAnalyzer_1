@@ -1,0 +1,659 @@
+<html>
+<head>
+<title>AXANG.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+.s4 { color: #2aacb8;}
+.s5 { color: #7a7e85;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+AXANG.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">matplotlib</span><span class="s2">.</span><span class="s1">pyplot </span><span class="s0">as </span><span class="s1">plt</span>
+<span class="s0">import </span><span class="s1">seaborn </span><span class="s0">as </span><span class="s1">sns</span>
+<span class="s0">from </span><span class="s1">altair</span><span class="s2">.</span><span class="s1">vegalite</span><span class="s2">.</span><span class="s1">v5</span><span class="s2">.</span><span class="s1">theme </span><span class="s0">import </span><span class="s1">theme</span>
+<span class="s0">from </span><span class="s1">jinja2</span><span class="s2">.</span><span class="s1">nodes </span><span class="s0">import </span><span class="s1">Slice</span>
+
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">model_selection </span><span class="s0">import </span><span class="s1">train_test_split</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">linear_model </span><span class="s0">import </span><span class="s1">LogisticRegression</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">svm </span><span class="s0">import </span><span class="s1">SVC</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">ensemble </span><span class="s0">import </span><span class="s1">RandomForestClassifier</span>
+<span class="s0">from </span><span class="s1">sklearn </span><span class="s0">import </span><span class="s1">metrics</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">preprocessing </span><span class="s0">import </span><span class="s1">StandardScaler</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">metrics </span><span class="s0">import </span><span class="s1">classification_report</span><span class="s2">, </span><span class="s1">confusion_matrix</span><span class="s2">, </span><span class="s1">accuracy_score</span><span class="s2">, </span><span class="s1">f1_score</span><span class="s2">, </span><span class="s1">precision_score</span><span class="s2">, </span><span class="s1">\</span>
+    <span class="s1">recall_score</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">model_selection </span><span class="s0">import </span><span class="s1">cross_val_score</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">pipeline </span><span class="s0">import </span><span class="s1">Pipeline</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">compose </span><span class="s0">import </span><span class="s1">ColumnTransformer</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">preprocessing </span><span class="s0">import </span><span class="s1">OneHotEncoder</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">model_selection </span><span class="s0">import </span><span class="s1">StratifiedKFold</span>
+<span class="s0">from </span><span class="s1">xgboost </span><span class="s0">import </span><span class="s1">XGBClassifier</span>
+
+<span class="s1">filepath </span><span class="s2">= </span><span class="s3">'C:</span><span class="s0">\\</span><span class="s3">Users</span><span class="s0">\\</span><span class="s3">Springrose</span><span class="s0">\\</span><span class="s3">Downloads</span><span class="s0">\\</span><span class="s3">FRAUD DETECTION</span><span class="s0">\\</span><span class="s3">Smart Claims Data.csv'</span>
+
+<span class="s1">df </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">read_csv</span><span class="s2">(</span><span class="s1">filepath</span><span class="s2">, </span><span class="s1">encoding</span><span class="s2">=</span><span class="s3">'cp1252'</span><span class="s2">)</span>
+<span class="s1">pd</span><span class="s2">.</span><span class="s1">set_option</span><span class="s2">(</span><span class="s3">'display.max_columns'</span><span class="s2">, </span><span class="s0">None</span><span class="s2">)</span>
+
+<span class="s1">df</span><span class="s2">.</span><span class="s1">drop</span><span class="s2">([</span><span class="s3">'Claim_ID'</span><span class="s2">, </span><span class="s3">'Customer_Phone'</span><span class="s2">, </span><span class="s3">'Customer_Email'</span><span class="s2">,</span>
+         <span class="s3">'Incident_Date'</span><span class="s2">, </span><span class="s3">'Claim_Submission_Date'</span><span class="s2">,</span>
+         <span class="s3">'Policy_Start_Date'</span><span class="s2">, </span><span class="s3">'Policy_End_Date'</span>
+         <span class="s2">], </span><span class="s1">axis</span><span class="s2">=</span><span class="s4">1</span><span class="s2">, </span><span class="s1">inplace</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+
+<span class="s1">suspicious_claims </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">] &gt; </span><span class="s4">300000</span><span class="s2">]</span>
+<span class="s5">#suspicious_claims</span>
+
+<span class="s1">non_suspicious_claims </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">] &lt; </span><span class="s4">300000</span><span class="s2">]</span>
+<span class="s5">#non_suspicious_claims</span>
+
+<span class="s1">df</span><span class="s2">.</span><span class="s1">drop</span><span class="s2">([</span><span class="s3">'Customer_Name'</span><span class="s2">, </span><span class="s3">'Policy_Number'</span><span class="s2">, </span><span class="s3">'Adjuster_Notes'</span><span class="s2">], </span><span class="s1">axis</span><span class="s2">=</span><span class="s4">1</span><span class="s2">, </span><span class="s1">inplace</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+
+<span class="s1">numerical_columns </span><span class="s2">= [</span><span class="s3">'Claim_Amount'</span><span class="s2">, </span><span class="s3">'Customer_Age'</span><span class="s2">, </span><span class="s3">'Premium_Amount'</span><span class="s2">]</span>
+<span class="s1">categorical_columns </span><span class="s2">= [</span><span class="s3">'Location'</span><span class="s2">, </span><span class="s3">'Policy_Type'</span><span class="s2">,</span>
+                       <span class="s3">'Claim_Type'</span><span class="s2">, </span><span class="s3">'Incident_Type'</span><span class="s2">,</span>
+                       <span class="s3">'Claim_Status'</span><span class="s2">, </span><span class="s3">'Customer_Gender'</span><span class="s2">,</span>
+                       <span class="s3">'Customer_Occupation'</span>
+                       <span class="s2">]</span>
+
+<span class="s1">df_model </span><span class="s2">= </span><span class="s1">df</span>
+
+<span class="s1">y </span><span class="s2">= </span><span class="s1">df_model</span><span class="s2">[</span><span class="s3">'Fraud_Flag'</span><span class="s2">]</span>
+<span class="s1">X </span><span class="s2">= </span><span class="s1">df_model</span><span class="s2">.</span><span class="s1">drop</span><span class="s2">([</span><span class="s3">'Fraud_Flag'</span><span class="s2">], </span><span class="s1">axis</span><span class="s2">=</span><span class="s4">1</span><span class="s2">)</span>
+
+<span class="s1">print</span><span class="s2">(</span><span class="s1">X</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s1">y</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">)</span>
+
+<span class="s1">X_train</span><span class="s2">, </span><span class="s1">X_test</span><span class="s2">, </span><span class="s1">y_train</span><span class="s2">, </span><span class="s1">y_test </span><span class="s2">= </span><span class="s1">train_test_split</span><span class="s2">(</span><span class="s1">X</span><span class="s2">, </span><span class="s1">y</span><span class="s2">, </span><span class="s1">test_size</span><span class="s2">=</span><span class="s4">0.30</span><span class="s2">, </span><span class="s1">stratify</span><span class="s2">=</span><span class="s1">y</span><span class="s2">)</span>
+
+<span class="s1">print</span><span class="s2">(</span><span class="s1">X_train</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s1">X_test</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s1">y_train</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s1">y_test</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">)</span>
+
+<span class="s5"># reshape the array as we are predicting for one instance</span>
+<span class="s5">#df_model.reshape(1,-1)</span>
+
+<span class="s1">preprocessor </span><span class="s2">= </span><span class="s1">ColumnTransformer</span><span class="s2">(</span>
+    <span class="s1">transformers</span><span class="s2">=[</span>
+        <span class="s2">(</span><span class="s3">'numerical'</span><span class="s2">, </span><span class="s1">StandardScaler</span><span class="s2">(), </span><span class="s1">numerical_columns</span><span class="s2">),</span>
+        <span class="s2">(</span><span class="s3">'categorical'</span><span class="s2">, </span><span class="s1">OneHotEncoder</span><span class="s2">(</span><span class="s1">drop</span><span class="s2">=</span><span class="s3">'first'</span><span class="s2">), </span><span class="s1">categorical_columns</span><span class="s2">)</span>
+    <span class="s2">],</span>
+    <span class="s1">remainder</span><span class="s2">=</span><span class="s3">'passthrough'</span>
+<span class="s2">)</span>
+
+<span class="s1">pipeline </span><span class="s2">= </span><span class="s1">Pipeline</span><span class="s2">([</span>
+    <span class="s2">(</span><span class="s3">'prep4'</span><span class="s2">, </span><span class="s1">preprocessor</span><span class="s2">),</span>
+    <span class="s2">(</span><span class="s3">'clf4'</span><span class="s2">, </span><span class="s1">XGBClassifier</span><span class="s2">(</span><span class="s1">objective</span><span class="s2">= </span><span class="s3">'binary:logistic'</span><span class="s2">))</span>
+<span class="s2">])</span>
+
+<span class="s1">pipeline</span><span class="s2">.</span><span class="s1">fit</span><span class="s2">(</span><span class="s1">X_train</span><span class="s2">, </span><span class="s1">y_train</span><span class="s2">)</span>
+
+<span class="s1">rf_predict </span><span class="s2">= </span><span class="s1">pipeline</span><span class="s2">.</span><span class="s1">predict</span><span class="s2">(</span><span class="s1">X_test</span><span class="s2">)</span>
+<span class="s5">#rf_predict</span>
+
+<span class="s1">print</span><span class="s2">(</span><span class="s1">classification_report</span><span class="s2">(</span><span class="s1">y_test</span><span class="s2">, </span><span class="s1">rf_predict</span><span class="s2">))</span>
+
+<span class="s1">cv </span><span class="s2">= </span><span class="s1">StratifiedKFold</span><span class="s2">(</span><span class="s1">n_splits</span><span class="s2">=</span><span class="s4">5</span><span class="s2">, </span><span class="s1">shuffle</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">random_state</span><span class="s2">=</span><span class="s4">42</span><span class="s2">)</span>
+
+<span class="s1">cv_score </span><span class="s2">= </span><span class="s1">cross_val_score</span><span class="s2">(</span><span class="s1">pipeline</span><span class="s2">, </span><span class="s1">X_train</span><span class="s2">, </span><span class="s1">y_train</span><span class="s2">, </span><span class="s1">cv</span><span class="s2">=</span><span class="s1">cv</span><span class="s2">, </span><span class="s1">scoring</span><span class="s2">=</span><span class="s3">&quot;accuracy&quot;</span><span class="s2">, </span><span class="s1">n_jobs</span><span class="s2">=-</span><span class="s4">1</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s3">'Cross validation score:'</span><span class="s2">, </span><span class="s1">cv_score</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s3">'Mean accuracy score:'</span><span class="s2">, </span><span class="s1">cv_score</span><span class="s2">.</span><span class="s1">mean</span><span class="s2">())</span>
+
+<span class="s0">import </span><span class="s1">streamlit </span><span class="s0">as </span><span class="s1">st</span>
+<span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">from </span><span class="s1">scipy</span><span class="s2">.</span><span class="s1">stats </span><span class="s0">import </span><span class="s1">zscore</span>
+<span class="s0">from </span><span class="s1">PIL </span><span class="s0">import </span><span class="s1">Image</span>
+<span class="s0">from </span><span class="s1">io </span><span class="s0">import </span><span class="s1">StringIO</span>
+<span class="s0">import </span><span class="s1">requests</span>
+<span class="s0">import </span><span class="s1">joblib</span>
+<span class="s0">from </span><span class="s1">streamlit_option_menu </span><span class="s0">import </span><span class="s1">option_menu</span>
+<span class="s0">import </span><span class="s1">base64</span>
+<span class="s0">import </span><span class="s1">json</span>
+<span class="s0">import </span><span class="s1">requests</span>
+<span class="s0">from </span><span class="s1">fpdf </span><span class="s0">import </span><span class="s1">FPDF</span>
+<span class="s0">import </span><span class="s1">os</span>
+
+<span class="s1">filepath </span><span class="s2">= </span><span class="s3">'C:</span><span class="s0">\\</span><span class="s3">Users</span><span class="s0">\\</span><span class="s3">Springrose</span><span class="s0">\\</span><span class="s3">Downloads</span><span class="s0">\\</span><span class="s3">FRAUD DETECTION</span><span class="s0">\\</span><span class="s3">Smart Claims Data.csv'</span>
+
+<span class="s1">df </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">read_csv</span><span class="s2">(</span><span class="s1">filepath</span><span class="s2">, </span><span class="s1">encoding</span><span class="s2">=</span><span class="s3">'latin-1'</span><span class="s2">)</span>
+<span class="s1">pd</span><span class="s2">.</span><span class="s1">set_option</span><span class="s2">(</span><span class="s3">'display.max_columns'</span><span class="s2">, </span><span class="s0">None</span><span class="s2">)</span>
+<span class="s5">#df.head()</span>
+
+<span class="s1">joblib</span><span class="s2">.</span><span class="s1">dump</span><span class="s2">(</span><span class="s1">pipeline</span><span class="s2">, </span><span class="s3">'fraud_detection_model.pkl'</span><span class="s2">)</span>
+<span class="s1">model </span><span class="s2">= </span><span class="s1">joblib</span><span class="s2">.</span><span class="s1">load</span><span class="s2">(</span><span class="s3">'fraud_detection_model.pkl'</span><span class="s2">)</span>
+
+<span class="s5"># Add widgets</span>
+<span class="s1">image </span><span class="s2">= </span><span class="s1">Image</span><span class="s2">.</span><span class="s1">open</span><span class="s2">(</span><span class="s3">'C:</span><span class="s0">\\</span><span class="s3">Users</span><span class="s0">\\</span><span class="s3">Springrose</span><span class="s0">\\</span><span class="s3">Downloads</span><span class="s0">\\</span><span class="s3">FRAUD DETECTION</span><span class="s0">\\</span><span class="s3">axa-logo.png'</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">image</span><span class="s2">(</span><span class="s1">image</span><span class="s2">, </span><span class="s1">width</span><span class="s2">=</span><span class="s4">70</span><span class="s2">)</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">'## AXA Mansard Insurance Plc'</span><span class="s2">)</span>
+<span class="s5"># st.markdown('##### Analyze insurance claims, detect fraud, simulate claims optimization and export reports.')</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">&quot;##### Life and Non-Life Insurance Claims Analyzer and Anomaly Detector&quot;</span><span class="s2">)</span>
+<span class="s5"># st.markdown('##### Welcome! 👋')</span>
+
+<span class="s5"># Set background image</span>
+<span class="s1">BACKGROUND_IMAGE </span><span class="s2">= </span><span class="s3">'C:</span><span class="s0">\\</span><span class="s3">Users</span><span class="s0">\\</span><span class="s3">Springrose</span><span class="s0">\\</span><span class="s3">Downloads</span><span class="s0">\\</span><span class="s3">FRAUD DETECTION</span><span class="s0">\\</span><span class="s3">BACKGROUND2.png'</span>
+
+<span class="s0">def </span><span class="s1">add_bg_from_local</span><span class="s2">(</span><span class="s1">image_file</span><span class="s2">):</span>
+    <span class="s0">with </span><span class="s1">open</span><span class="s2">(</span><span class="s1">image_file</span><span class="s2">, </span><span class="s3">&quot;rb&quot;</span><span class="s2">) </span><span class="s0">as </span><span class="s1">image_file</span><span class="s2">:</span>
+        <span class="s1">encoded_string </span><span class="s2">= </span><span class="s1">base64</span><span class="s2">.</span><span class="s1">b64encode</span><span class="s2">(</span><span class="s1">image_file</span><span class="s2">.</span><span class="s1">read</span><span class="s2">())</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span>
+    <span class="s3">f&quot;&quot;&quot;</span>
+    <span class="s3">&lt;style&gt;</span>
+    <span class="s3">.stApp </span><span class="s0">{{</span>
+        <span class="s3">background-image: url(data:image/</span><span class="s0">{</span><span class="s3">&quot;png&quot;</span><span class="s0">}</span><span class="s3">;base64,</span><span class="s0">{</span><span class="s1">encoded_string</span><span class="s2">.</span><span class="s1">decode</span><span class="s2">()</span><span class="s0">}</span><span class="s3">);</span>
+        <span class="s3">background-size: cover</span>
+    <span class="s0">}}</span>
+    <span class="s3">&lt;/style&gt;</span>
+    <span class="s3">&quot;&quot;&quot;</span><span class="s2">,</span>
+    <span class="s1">unsafe_allow_html</span><span class="s2">=</span><span class="s0">True</span>
+    <span class="s2">)</span>
+<span class="s1">add_bg_from_local</span><span class="s2">(</span><span class="s1">BACKGROUND_IMAGE</span><span class="s2">)</span>
+
+<span class="s5"># Sidebar for Navigation</span>
+<span class="s0">with </span><span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">:</span>
+    <span class="s1">selected </span><span class="s2">= </span><span class="s1">option_menu</span><span class="s2">(</span>
+        <span class="s3">'Supporting Documentation'</span><span class="s2">,</span>
+        <span class="s2">[</span><span class="s3">'Methodology'</span><span class="s2">, </span><span class="s3">'How to Use'</span><span class="s2">, </span><span class="s3">'Code Base'</span><span class="s2">, </span><span class="s3">'Requirements'</span><span class="s2">],</span>
+        <span class="s1">icons</span><span class="s2">=[</span><span class="s3">'book'</span><span class="s2">, </span><span class="s3">'person'</span><span class="s2">, </span><span class="s3">'code'</span><span class="s2">, </span><span class="s3">'book'</span><span class="s2">],</span>
+        <span class="s1">default_index</span><span class="s2">=</span><span class="s4">0</span><span class="s2">,</span>
+    <span class="s2">)</span>
+
+<span class="s0">with </span><span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">container</span><span class="s2">():</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">&quot;----------&quot;</span><span class="s2">)  </span><span class="s5"># Optional separator</span>
+
+<span class="s5"># Setting Page Configuration</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">set_page_config</span><span class="s2">(</span><span class="s1">page_title</span><span class="s2">=</span><span class="s3">&quot;Life and Non-Life Insurance Claims Analyzer and Anomaly Detector&quot;</span><span class="s2">,</span>
+                   <span class="s1">layout</span><span class="s2">=</span><span class="s3">&quot;wide&quot;</span><span class="s2">, </span><span class="s1">page_icon</span><span class="s2">=</span><span class="s3">&quot;thumbs_up&quot;</span><span class="s2">)</span>
+
+<span class="s5"># ---- Load Data ----</span>
+<span class="s2">@</span><span class="s1">st</span><span class="s2">.</span><span class="s1">cache_data</span>
+<span class="s0">def </span><span class="s1">load_data</span><span class="s2">():</span>
+    <span class="s0">return </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">read_csv</span><span class="s2">(</span><span class="s1">filepath</span><span class="s2">, </span><span class="s1">encoding</span><span class="s2">=</span><span class="s3">'latin-1'</span><span class="s2">)</span>
+
+<span class="s5"># ---- User Auth (CSV-based) ----</span>
+<span class="s0">def </span><span class="s1">load_users</span><span class="s2">():</span>
+    <span class="s0">if </span><span class="s1">os</span><span class="s2">.</span><span class="s1">path</span><span class="s2">.</span><span class="s1">exists</span><span class="s2">(</span><span class="s3">&quot;users.csv&quot;</span><span class="s2">):</span>
+        <span class="s0">return </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">read_csv</span><span class="s2">(</span><span class="s3">&quot;users.csv&quot;</span><span class="s2">)</span>
+    <span class="s0">else</span><span class="s2">:</span>
+        <span class="s0">return </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">DataFrame</span><span class="s2">(</span><span class="s1">columns</span><span class="s2">=[</span><span class="s3">&quot;username&quot;</span><span class="s2">, </span><span class="s3">&quot;password&quot;</span><span class="s2">])</span>
+
+<span class="s0">def </span><span class="s1">save_user</span><span class="s2">(</span><span class="s1">username</span><span class="s2">, </span><span class="s1">password</span><span class="s2">):</span>
+    <span class="s5"># Load existing users or create a new DataFrame if file doesn't exist</span>
+    <span class="s0">try</span><span class="s2">:</span>
+        <span class="s1">users </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">read_csv</span><span class="s2">(</span><span class="s3">&quot;users.csv&quot;</span><span class="s2">)</span>
+    <span class="s0">except </span><span class="s1">FileNotFoundError</span><span class="s2">:</span>
+        <span class="s1">users </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">DataFrame</span><span class="s2">(</span><span class="s1">columns</span><span class="s2">=[</span><span class="s3">&quot;username&quot;</span><span class="s2">, </span><span class="s3">&quot;password&quot;</span><span class="s2">])</span>
+
+    <span class="s5"># Create a new row as a DataFrame</span>
+    <span class="s1">new_user </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">DataFrame</span><span class="s2">([{</span><span class="s3">&quot;username&quot;</span><span class="s2">: </span><span class="s1">username</span><span class="s2">, </span><span class="s3">&quot;password&quot;</span><span class="s2">: </span><span class="s1">password</span><span class="s2">}])</span>
+
+    <span class="s5"># ✅ Concatenate the new user row</span>
+    <span class="s1">users </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">concat</span><span class="s2">([</span><span class="s1">users</span><span class="s2">, </span><span class="s1">new_user</span><span class="s2">], </span><span class="s1">ignore_index</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+
+    <span class="s5"># Save the updated users list back to CSV</span>
+    <span class="s1">users</span><span class="s2">.</span><span class="s1">to_csv</span><span class="s2">(</span><span class="s3">&quot;users.csv&quot;</span><span class="s2">, </span><span class="s1">index</span><span class="s2">=</span><span class="s0">False</span><span class="s2">)</span>
+    <span class="s0">return True</span>
+
+<span class="s5"># ---- PDF Generator ----</span>
+<span class="s0">def </span><span class="s1">generate_pdf_report</span><span class="s2">(</span><span class="s1">data_summary</span><span class="s2">):</span>
+    <span class="s1">pdf </span><span class="s2">= </span><span class="s1">FPDF</span><span class="s2">()</span>
+    <span class="s1">pdf</span><span class="s2">.</span><span class="s1">add_page</span><span class="s2">()</span>
+    <span class="s1">pdf</span><span class="s2">.</span><span class="s1">set_font</span><span class="s2">(</span><span class="s3">&quot;Arial&quot;</span><span class="s2">, </span><span class="s1">size</span><span class="s2">=</span><span class="s4">14</span><span class="s2">)</span>
+    <span class="s1">pdf</span><span class="s2">.</span><span class="s1">cell</span><span class="s2">(</span><span class="s4">200</span><span class="s2">, </span><span class="s4">10</span><span class="s2">, </span><span class="s1">txt</span><span class="s2">=</span><span class="s3">&quot;Claims Analysis Report&quot;</span><span class="s2">, </span><span class="s1">ln</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">align</span><span class="s2">=</span><span class="s3">'C'</span><span class="s2">)</span>
+    <span class="s1">pdf</span><span class="s2">.</span><span class="s1">ln</span><span class="s2">(</span><span class="s4">10</span><span class="s2">)</span>
+    <span class="s0">for </span><span class="s1">line </span><span class="s0">in </span><span class="s1">data_summary</span><span class="s2">:</span>
+        <span class="s1">pdf</span><span class="s2">.</span><span class="s1">multi_cell</span><span class="s2">(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">10</span><span class="s2">, </span><span class="s1">line</span><span class="s2">)</span>
+    <span class="s1">filename </span><span class="s2">= </span><span class="s3">&quot;claims_report.pdf&quot;</span>
+    <span class="s1">pdf</span><span class="s2">.</span><span class="s1">output</span><span class="s2">(</span><span class="s1">filename</span><span class="s2">)</span>
+    <span class="s0">return </span><span class="s1">filename</span>
+
+
+<span class="s5"># ---- Sidebar: Login/Register ----</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s3">&quot;🔐 User Authentication&quot;</span><span class="s2">)</span>
+
+<span class="s1">users_df </span><span class="s2">= </span><span class="s1">load_users</span><span class="s2">()</span>
+<span class="s1">auth_mode </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">radio</span><span class="s2">(</span><span class="s3">&quot;Choose Action&quot;</span><span class="s2">, [</span><span class="s3">&quot;Login&quot;</span><span class="s2">, </span><span class="s3">&quot;Register&quot;</span><span class="s2">])</span>
+<span class="s1">username </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">text_input</span><span class="s2">(</span><span class="s3">&quot;Username&quot;</span><span class="s2">)</span>
+<span class="s1">password </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">text_input</span><span class="s2">(</span><span class="s3">&quot;Password&quot;</span><span class="s2">, </span><span class="s1">type</span><span class="s2">=</span><span class="s3">&quot;password&quot;</span><span class="s2">)</span>
+
+<span class="s1">auth_success </span><span class="s2">= </span><span class="s0">False</span>
+<span class="s0">if </span><span class="s1">auth_mode </span><span class="s2">== </span><span class="s3">&quot;Login&quot;</span><span class="s2">:</span>
+    <span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Login&quot;</span><span class="s2">):</span>
+        <span class="s0">if </span><span class="s1">username </span><span class="s0">in </span><span class="s1">users_df</span><span class="s2">[</span><span class="s3">&quot;username&quot;</span><span class="s2">].</span><span class="s1">values</span><span class="s2">:</span>
+            <span class="s1">user_row </span><span class="s2">= </span><span class="s1">users_df</span><span class="s2">[</span><span class="s1">users_df</span><span class="s2">[</span><span class="s3">&quot;username&quot;</span><span class="s2">] == </span><span class="s1">username</span><span class="s2">]</span>
+            <span class="s0">if </span><span class="s1">user_row</span><span class="s2">[</span><span class="s3">&quot;password&quot;</span><span class="s2">].</span><span class="s1">values</span><span class="s2">[</span><span class="s4">0</span><span class="s2">] == </span><span class="s1">password</span><span class="s2">:</span>
+                <span class="s1">auth_success </span><span class="s2">= </span><span class="s0">True</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">error</span><span class="s2">(</span><span class="s3">&quot;Incorrect password.&quot;</span><span class="s2">)</span>
+        <span class="s0">else</span><span class="s2">:</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">warning</span><span class="s2">(</span><span class="s3">&quot;User not found.&quot;</span><span class="s2">)</span>
+<span class="s0">else</span><span class="s2">:</span>
+    <span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Register&quot;</span><span class="s2">):</span>
+        <span class="s0">if </span><span class="s1">save_user</span><span class="s2">(</span><span class="s1">username</span><span class="s2">, </span><span class="s1">password</span><span class="s2">):</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">success</span><span class="s2">(</span><span class="s3">&quot;Hurray! You have just been registered. Please login.&quot;</span><span class="s2">)</span>
+        <span class="s0">else</span><span class="s2">:</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">warning</span><span class="s2">(</span><span class="s3">&quot;Username already exist.&quot;</span><span class="s2">)</span>
+            <span class="s1">auth_success </span><span class="s2">= </span><span class="s0">True</span>
+
+<span class="s0">with </span><span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">container</span><span class="s2">():</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">&quot;----------&quot;</span><span class="s2">)  </span><span class="s5"># Optional separator</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">&quot;#### Created and Designed By :&quot;</span><span class="s2">)</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">&quot;- Kenechukwu Nweke&quot;</span><span class="s2">)</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">&quot;- Abdulwahab Zakariyau&quot;</span><span class="s2">)</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">&quot;- Chinenye John&quot;</span><span class="s2">)</span>
+
+<span class="s5"># ---- MAIN APP ----</span>
+<span class="s0">if </span><span class="s1">auth_success</span><span class="s2">:</span>
+    <span class="s5"># Navigation Tabs</span>
+    <span class="s1">tab1</span><span class="s2">, </span><span class="s1">tab2</span><span class="s2">, </span><span class="s1">tab3</span><span class="s2">, </span><span class="s1">tab4 </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">tabs</span><span class="s2">([</span><span class="s3">&quot;🏠 Home&quot;</span><span class="s2">, </span><span class="s3">&quot;📊 Dashboard&quot;</span><span class="s2">, </span><span class="s3">&quot;📥 Export Report&quot;</span><span class="s2">, </span><span class="s3">&quot;📄 PDF Report Summary&quot;</span><span class="s2">])</span>
+
+    <span class="s0">with </span><span class="s1">tab1</span><span class="s2">:</span>
+        <span class="s5"># st.markdown(&quot;##### Life and Non-Life Insurance Claims Analyzer and Anomaly Detector&quot;)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">'##### Analyze insurance claims, detect fraud, simulate claims optimization and export reports.'</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">&quot;##### Welcome **&quot; </span><span class="s2">+ </span><span class="s1">username </span><span class="s2">+ </span><span class="s3">&quot;**! 👋&quot;</span><span class="s2">)</span>
+        <span class="s1">st_lottie </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">components</span><span class="s2">.</span><span class="s1">v1</span><span class="s2">.</span><span class="s1">html</span><span class="s2">(</span><span class="s3">f&quot;&quot;&quot;</span>
+        <span class="s3">&lt;lottie-player src=&quot;https://assets1.lottiefiles.com/packages/lf20_jcikwtux.json&quot; background=&quot;transparent&quot; speed=&quot;1&quot; style=&quot;width: 400px; height: 400px;&quot; loop autoplay&gt;&lt;/lottie-player&gt;</span>
+        <span class="s3">&quot;&quot;&quot;</span><span class="s2">, </span><span class="s1">height</span><span class="s2">=</span><span class="s4">400</span><span class="s2">)</span>
+
+    <span class="s0">with </span><span class="s1">tab2</span><span class="s2">:</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">header</span><span class="s2">(</span><span class="s3">&quot;📊 Claim Analytics Dashboard&quot;</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s3">&quot;Claims Data Preview&quot;</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">dataframe</span><span class="s2">(</span><span class="s1">df</span><span class="s2">.</span><span class="s1">head</span><span class="s2">())</span>
+
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s3">&quot;High Value Claim Detection&quot;</span><span class="s2">)</span>
+        <span class="s1">threshold </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">quantile</span><span class="s2">(</span><span class="s4">0.80</span><span class="s2">)</span>
+        <span class="s1">high_claims </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">] &gt; </span><span class="s1">threshold</span><span class="s2">]</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f&quot;- Claims above 80th percentile (₦</span><span class="s0">{</span><span class="s1">threshold</span><span class="s0">:</span><span class="s3">.2f</span><span class="s0">}</span><span class="s3">)&quot;</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">dataframe</span><span class="s2">(</span><span class="s1">high_claims</span><span class="s2">)</span>
+
+        <span class="s1">threshold </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">quantile</span><span class="s2">(</span><span class="s4">0.80</span><span class="s2">)</span>
+        <span class="s1">high_claims </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">] &gt; </span><span class="s1">threshold</span><span class="s2">]</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f&quot;- Number of suspicious high-amount claims: </span><span class="s0">{</span><span class="s1">len</span><span class="s2">(</span><span class="s1">high_claims</span><span class="s2">)</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">)</span>
+
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s3">&quot;Frequent Claimants&quot;</span><span class="s2">)</span>
+        <span class="s1">frequent_claims </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Customer_Name'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">()</span>
+        <span class="s1">frequent_customers </span><span class="s2">= </span><span class="s1">frequent_claims</span><span class="s2">[</span><span class="s1">frequent_claims </span><span class="s2">&gt; </span><span class="s4">3</span><span class="s2">]</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f&quot;- Customers with greater than 3 claims: </span><span class="s0">{</span><span class="s1">len</span><span class="s2">(</span><span class="s1">frequent_customers</span><span class="s2">)</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">dataframe</span><span class="s2">(</span><span class="s1">frequent_customers</span><span class="s2">)</span>
+
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s3">&quot;Z-Score Anomaly Detection&quot;</span><span class="s2">)</span>
+        <span class="s1">df</span><span class="s2">[</span><span class="s3">'z_score'</span><span class="s2">] = </span><span class="s1">zscore</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">])</span>
+        <span class="s1">anomalies </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'z_score'</span><span class="s2">].</span><span class="s1">abs</span><span class="s2">() &gt; </span><span class="s4">3</span><span class="s2">]</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f&quot;- Anomalous claims (Z &gt; 3): </span><span class="s0">{</span><span class="s1">len</span><span class="s2">(</span><span class="s1">anomalies</span><span class="s2">)</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">dataframe</span><span class="s2">(</span><span class="s1">anomalies</span><span class="s2">)</span>
+
+        <span class="s0">if </span><span class="s3">'Claim_Type' </span><span class="s0">in </span><span class="s1">df</span><span class="s2">.</span><span class="s1">columns</span><span class="s2">:</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s3">&quot;Cost Center Analysis&quot;</span><span class="s2">)</span>
+            <span class="s1">cost_centre </span><span class="s2">= </span><span class="s1">df</span><span class="s2">.</span><span class="s1">groupby</span><span class="s2">(</span><span class="s3">'Incident_Type'</span><span class="s2">)[</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">().</span><span class="s1">sort_values</span><span class="s2">(</span><span class="s1">ascending</span><span class="s2">=</span><span class="s0">False</span><span class="s2">)</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">bar_chart</span><span class="s2">(</span><span class="s1">cost_centre</span><span class="s2">)</span>
+
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s3">&quot;Simulated Claim Capitation&quot;</span><span class="s2">)</span>
+        <span class="s1">df</span><span class="s2">[</span><span class="s3">'capped_claim'</span><span class="s2">] = </span><span class="s1">np</span><span class="s2">.</span><span class="s1">where</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">] &gt; </span><span class="s4">300000</span><span class="s2">, </span><span class="s4">300000</span><span class="s2">, </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">])</span>
+        <span class="s1">savings </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">() - </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'capped_claim'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f&quot;- Total Savings with Cap: ₦</span><span class="s0">{</span><span class="s1">savings</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">)</span>
+
+        <span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Start_Date'</span><span class="s2">] = </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">to_datetime</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Start_Date'</span><span class="s2">])</span>
+        <span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_End_Date'</span><span class="s2">] = </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">to_datetime</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_End_Date'</span><span class="s2">])</span>
+        <span class="s1">df</span><span class="s2">[</span><span class="s3">'Incident_Date'</span><span class="s2">] = </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">to_datetime</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Incident_Date'</span><span class="s2">])</span>
+        <span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Submission_Date'</span><span class="s2">] = </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">to_datetime</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Submission_Date'</span><span class="s2">])</span>
+
+        <span class="s5"># Extract year and month of policy inception</span>
+        <span class="s1">df</span><span class="s2">[</span><span class="s3">'policy_inception_year'</span><span class="s2">] = </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Start_Date'</span><span class="s2">].</span><span class="s1">dt</span><span class="s2">.</span><span class="s1">year</span>
+        <span class="s1">df</span><span class="s2">[</span><span class="s3">'policy_inception_month'</span><span class="s2">] = </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Start_Date'</span><span class="s2">].</span><span class="s1">dt</span><span class="s2">.</span><span class="s1">month</span>
+
+        <span class="s5"># Visualizing years of policy inception between 2022 to 2024</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s3">&quot;Year on Year Chart by Policy Inception (2022-2024)&quot;</span><span class="s2">)</span>
+        <span class="s5">#st.bar_chart(df, x=&quot;policy_inception_year&quot;, y=&quot;Claim_Amount&quot;, color=&quot;#0096C7&quot;, horizontal=True)</span>
+        <span class="s1">year_to_year </span><span class="s2">= </span><span class="s1">df</span><span class="s2">.</span><span class="s1">groupby</span><span class="s2">(</span><span class="s3">'policy_inception_year'</span><span class="s2">)[</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">().</span><span class="s1">sort_values</span><span class="s2">(</span><span class="s1">ascending</span><span class="s2">=</span><span class="s0">False</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">bar_chart</span><span class="s2">(</span><span class="s1">year_to_year</span><span class="s2">)</span>
+
+        <span class="s5"># Visualizing months of policy inception between 2022 to 2024</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s3">&quot;Month to Month Chart by Policy Inception (2022-2024)&quot;</span><span class="s2">)</span>
+        <span class="s5">#st.bar_chart(df, x=&quot;policy_inception_month&quot;, y=&quot;Claim_Amount&quot;, color=&quot;#0096C7&quot;, horizontal=True)</span>
+        <span class="s1">month_to_month </span><span class="s2">= </span><span class="s1">df</span><span class="s2">.</span><span class="s1">groupby</span><span class="s2">(</span><span class="s3">'policy_inception_month'</span><span class="s2">)[</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">().</span><span class="s1">sort_values</span><span class="s2">(</span><span class="s1">ascending</span><span class="s2">=</span><span class="s0">False</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">bar_chart</span><span class="s2">(</span><span class="s1">month_to_month</span><span class="s2">)</span>
+
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">subheader</span><span class="s2">(</span><span class="s3">&quot;Other Cost Center Analysis&quot;</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Type'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">())</span>
+        <span class="s5">#print('\n')</span>
+        <span class="s1">corporate_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Corporate'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Corporate claims total amount: ₦</span><span class="s0">{</span><span class="s1">corporate_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">family_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Family'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Family claims total amount: ₦</span><span class="s0">{</span><span class="s1">family_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">individual_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Individual'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Individual claims total amount: ₦</span><span class="s0">{</span><span class="s1">individual_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Type'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">())</span>
+        <span class="s5">#print('\n')</span>
+        <span class="s1">gadget_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Gadget'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Gadget claims total amount: ₦</span><span class="s0">{</span><span class="s1">gadget_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">auto_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Auto'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Auto claims total amount: ₦</span><span class="s0">{</span><span class="s1">auto_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">Fire_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Fire'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Fire claims total amount: ₦</span><span class="s0">{</span><span class="s1">Fire_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">life_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Life'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Life claims total amount: ₦</span><span class="s0">{</span><span class="s1">life_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">health_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Health'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Health claims total amount: ₦</span><span class="s0">{</span><span class="s1">health_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Incident_Type'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">())</span>
+        <span class="s5">#print('\n')</span>
+        <span class="s1">death_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Incident_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Death'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Death claims total amount: ₦</span><span class="s0">{</span><span class="s1">death_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">theft_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Incident_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Theft'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Theft claims total amount: ₦</span><span class="s0">{</span><span class="s1">theft_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">fire_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Incident_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Fire'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Fire claims total amount: ₦</span><span class="s0">{</span><span class="s1">fire_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">accident_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Incident_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Accident'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Accident claims total amount: ₦</span><span class="s0">{</span><span class="s1">accident_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">illness_claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Incident_Type'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Illness'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Illness claims total amount: ₦</span><span class="s0">{</span><span class="s1">illness_claim_amount</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Status'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">())</span>
+        <span class="s5">#print('\n')</span>
+        <span class="s1">approved_claims_total_amount_paid </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Status'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Approved'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Approved claims total amount paid: ₦</span><span class="s0">{</span><span class="s1">approved_claims_total_amount_paid</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">ave_appr_claims_total_amount_paid </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Status'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Approved'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">() / </span><span class="s4">589</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Average approved claims total amount paid: ₦</span><span class="s0">{</span><span class="s1">ave_appr_claims_total_amount_paid</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+
+        <span class="s5"># Minimum and maximum claim amount</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f&quot;- Minimum claim amount: ₦</span><span class="s0">{</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">min</span><span class="s2">()</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f&quot;- Maximum claim amount: ₦</span><span class="s0">{</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">max</span><span class="s2">()</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">)</span>
+
+        <span class="s5"># Claim status count</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Status'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">())</span>
+        <span class="s5">#print('\n')</span>
+        <span class="s5"># Customer gender count</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Customer_Gender'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">())</span>
+        <span class="s5">#print('\n')</span>
+        <span class="s5"># Customer occupation count</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Customer_Occupation'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">())</span>
+
+        <span class="s5"># Customer count by Location</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Location'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">())</span>
+
+        <span class="s5"># Claim amount by Location</span>
+        <span class="s5">#st.write(df.groupby('Location')['Claim_Amount'].sum())</span>
+        <span class="s1">claim_amount_abuja </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Location'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Abuja'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Abuja total claim amount: ₦</span><span class="s0">{</span><span class="s1">claim_amount_abuja</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">claim_amount_ibadan </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Location'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Ibadan'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Ibadan total claim amount: ₦</span><span class="s0">{</span><span class="s1">claim_amount_ibadan</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">claim_amount_kano </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Location'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Kano'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Kano total claim amount: ₦</span><span class="s0">{</span><span class="s1">claim_amount_kano</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">claim_amount_lagos </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Location'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Lagos'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Lagos total claim amount: ₦</span><span class="s0">{</span><span class="s1">claim_amount_lagos</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+        <span class="s1">claim_amount_ph </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Location'</span><span class="s2">].</span><span class="s1">isin</span><span class="s2">([</span><span class="s3">'Port Harcourt'</span><span class="s2">])][</span><span class="s3">'Claim_Amount'</span><span class="s2">].</span><span class="s1">sum</span><span class="s2">()</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f'- Port Harcourt total claim amount: ₦</span><span class="s0">{</span><span class="s1">claim_amount_ph</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+
+    <span class="s0">with </span><span class="s1">tab3</span><span class="s2">:</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">header</span><span class="s2">(</span><span class="s3">&quot;📤 Export Data&quot;</span><span class="s2">)</span>
+        <span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Export to Excel&quot;</span><span class="s2">):</span>
+            <span class="s1">df</span><span class="s2">.</span><span class="s1">to_excel</span><span class="s2">(</span><span class="s3">&quot;processed_insurance.xlsx&quot;</span><span class="s2">, </span><span class="s1">index</span><span class="s2">=</span><span class="s0">False</span><span class="s2">)</span>
+            <span class="s0">with </span><span class="s1">open</span><span class="s2">(</span><span class="s3">&quot;processed_insurance.xlsx&quot;</span><span class="s2">, </span><span class="s3">&quot;rb&quot;</span><span class="s2">) </span><span class="s0">as </span><span class="s1">file</span><span class="s2">:</span>
+                <span class="s1">b64 </span><span class="s2">= </span><span class="s1">base64</span><span class="s2">.</span><span class="s1">b64encode</span><span class="s2">(</span><span class="s1">file</span><span class="s2">.</span><span class="s1">read</span><span class="s2">()).</span><span class="s1">decode</span><span class="s2">()</span>
+                <span class="s1">href </span><span class="s2">= </span><span class="s3">f'&lt;a href=&quot;data:application/octet-stream;base64,</span><span class="s0">{</span><span class="s1">b64</span><span class="s0">}</span><span class="s3">&quot; download=&quot;processed_insurance.xlsx&quot;&gt;📥 Download Excel&lt;/a&gt;'</span>
+                <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s1">href</span><span class="s2">, </span><span class="s1">unsafe_allow_html</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+
+    <span class="s0">with </span><span class="s1">tab4</span><span class="s2">:</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">header</span><span class="s2">(</span><span class="s3">&quot;📄 Generate PDF Report&quot;</span><span class="s2">)</span>
+    <span class="s1">report_summary </span><span class="s2">= [</span>
+        <span class="s3">f&quot;Total Claims: </span><span class="s0">{</span><span class="s1">len</span><span class="s2">(</span><span class="s1">df</span><span class="s2">)</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">,</span>
+        <span class="s3">f&quot;High-Value Claims (&gt;80th percentile): </span><span class="s0">{</span><span class="s1">len</span><span class="s2">(</span><span class="s1">high_claims</span><span class="s2">)</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">,</span>
+        <span class="s3">f&quot;Frequent Claimants (&gt;3 claims): </span><span class="s0">{</span><span class="s1">len</span><span class="s2">(</span><span class="s1">frequent_customers</span><span class="s2">)</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">,</span>
+        <span class="s3">f&quot;Anomalous Z-Score Claims: </span><span class="s0">{</span><span class="s1">len</span><span class="s2">(</span><span class="s1">anomalies</span><span class="s2">)</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">,</span>
+        <span class="s3">f&quot;Total Savings after Cap: ₦</span><span class="s0">{</span><span class="s1">savings</span><span class="s0">:</span><span class="s3">,.2f</span><span class="s0">}</span><span class="s3">&quot;</span>
+    <span class="s2">]</span>
+
+    <span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Generate PDF Report&quot;</span><span class="s2">):</span>
+        <span class="s1">pdf_file </span><span class="s2">= </span><span class="s1">generate_pdf_report</span><span class="s2">(</span><span class="s1">report_summary</span><span class="s2">)</span>
+        <span class="s0">with </span><span class="s1">open</span><span class="s2">(</span><span class="s1">pdf_file</span><span class="s2">, </span><span class="s3">&quot;rb&quot;</span><span class="s2">) </span><span class="s0">as </span><span class="s1">file</span><span class="s2">:</span>
+            <span class="s1">b64 </span><span class="s2">= </span><span class="s1">base64</span><span class="s2">.</span><span class="s1">b64encode</span><span class="s2">(</span><span class="s1">file</span><span class="s2">.</span><span class="s1">read</span><span class="s2">()).</span><span class="s1">decode</span><span class="s2">()</span>
+            <span class="s1">href </span><span class="s2">= </span><span class="s3">f'&lt;a href=&quot;data:application/octet-stream;base64,</span><span class="s0">{</span><span class="s1">b64</span><span class="s0">}</span><span class="s3">&quot; download=&quot;</span><span class="s0">{</span><span class="s1">pdf_file</span><span class="s0">}</span><span class="s3">&quot;&gt;📄 Download Report&lt;/a&gt;'</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s1">href</span><span class="s2">, </span><span class="s1">unsafe_allow_html</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+<span class="s0">else</span><span class="s2">:</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">warning</span><span class="s2">(</span><span class="s3">&quot;Please, login to access the dashboard.&quot;</span><span class="s2">)</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">divider</span><span class="s2">()</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">&quot;###### Select any option below to filter claims data&quot;</span><span class="s2">)</span>
+
+<span class="s5"># Filter claims data with select boxes</span>
+<span class="s5"># Get unique options for each filter and add '--Select--'</span>
+<span class="s1">location </span><span class="s2">= </span><span class="s1">list</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Location'</span><span class="s2">].</span><span class="s1">unique</span><span class="s2">())</span>
+<span class="s1">policy_type </span><span class="s2">= </span><span class="s1">list</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Type'</span><span class="s2">].</span><span class="s1">unique</span><span class="s2">())</span>
+<span class="s1">claim_type </span><span class="s2">= </span><span class="s1">list</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Type'</span><span class="s2">].</span><span class="s1">unique</span><span class="s2">())</span>
+<span class="s1">incident_type </span><span class="s2">= </span><span class="s1">list</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Incident_Type'</span><span class="s2">].</span><span class="s1">unique</span><span class="s2">())</span>
+<span class="s1">customer_gender </span><span class="s2">= </span><span class="s1">list</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Customer_Gender'</span><span class="s2">].</span><span class="s1">unique</span><span class="s2">())</span>
+<span class="s1">customer_age </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Customer_Age'</span><span class="s2">].</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">int</span><span class="s2">)</span>
+<span class="s1">customer_occupation </span><span class="s2">= </span><span class="s1">list</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Customer_Occupation'</span><span class="s2">].</span><span class="s1">unique</span><span class="s2">())</span>
+<span class="s1">claim_status </span><span class="s2">= </span><span class="s1">list</span><span class="s2">(</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Status'</span><span class="s2">].</span><span class="s1">unique</span><span class="s2">())</span>
+<span class="s1">premium_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Premium_Amount'</span><span class="s2">]</span>
+<span class="s1">claim_amount </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">]</span>
+<span class="s5">#incident_date = ['--Select--'] + list(df['Incident_Date'])</span>
+<span class="s5">#claim_submission_date = ['--Select--'] + list(df['Claim_Submission_Date'])</span>
+<span class="s5">#policy_start_date = ['--Select--'] + list(df['Policy_Start_Date'])</span>
+<span class="s5">#policy_end_date = ['--Select--'] + list(df['Policy_End_Date'])</span>
+
+<span class="s5"># Create the select boxes</span>
+<span class="s1">selected_loc </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">selectbox</span><span class="s2">(</span><span class="s3">&quot;Location :&quot;</span><span class="s2">, </span><span class="s1">options</span><span class="s2">=</span><span class="s1">location</span><span class="s2">)</span>
+<span class="s1">selected_pt </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">selectbox</span><span class="s2">(</span><span class="s3">&quot;Policy type :&quot;</span><span class="s2">, </span><span class="s1">options</span><span class="s2">=</span><span class="s1">policy_type</span><span class="s2">)</span>
+<span class="s1">selected_ct </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">selectbox</span><span class="s2">(</span><span class="s3">&quot;Claim type :&quot;</span><span class="s2">, </span><span class="s1">options</span><span class="s2">=</span><span class="s1">claim_type</span><span class="s2">)</span>
+<span class="s1">selected_it </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">selectbox</span><span class="s2">(</span><span class="s3">&quot;Incident type :&quot;</span><span class="s2">, </span><span class="s1">options</span><span class="s2">=</span><span class="s1">incident_type</span><span class="s2">)</span>
+<span class="s1">selected_customer_gender </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">selectbox</span><span class="s2">(</span><span class="s3">'Customer gender :'</span><span class="s2">, </span><span class="s1">options</span><span class="s2">=</span><span class="s1">customer_gender</span><span class="s2">)</span>
+<span class="s1">selected_customer_age </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">selectbox</span><span class="s2">(</span><span class="s3">'Customer age :'</span><span class="s2">, </span><span class="s1">options</span><span class="s2">=</span><span class="s1">customer_age</span><span class="s2">)</span>
+<span class="s1">selected_customer_occupation </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">selectbox</span><span class="s2">(</span><span class="s3">'Customer occupation :'</span><span class="s2">, </span><span class="s1">options</span><span class="s2">=</span><span class="s1">customer_occupation</span><span class="s2">)</span>
+<span class="s1">selected_claim_status </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">selectbox</span><span class="s2">(</span><span class="s3">'Claim status :'</span><span class="s2">, </span><span class="s1">options</span><span class="s2">=</span><span class="s1">claim_status</span><span class="s2">)</span>
+<span class="s1">selected_premium_amount </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">number_input</span><span class="s2">(</span><span class="s3">'Enter premium amount (₦) :'</span><span class="s2">,</span>
+                               <span class="s1">min_value</span><span class="s2">=</span><span class="s4">0.00</span><span class="s2">,</span>
+                               <span class="s1">value</span><span class="s2">=</span><span class="s4">0.00</span><span class="s2">,</span>
+                               <span class="s1">step</span><span class="s2">=</span><span class="s4">0.01</span><span class="s2">,</span>
+                               <span class="s1">format</span><span class="s2">=</span><span class="s3">&quot;%.2f&quot;</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">&quot;Premium amount entered : ₦&quot;</span><span class="s2">, </span><span class="s1">selected_premium_amount</span><span class="s2">)</span>
+<span class="s5">#selected_incident_date = st.date_input(&quot;Incident date :&quot;)</span>
+<span class="s5">#selected_claim_submission_date = st.date_input(&quot;Claim submission date :&quot;)</span>
+<span class="s5">#selected_policy_start_date = st.date_input(&quot;Policy start date :&quot;)</span>
+<span class="s5">#selected_policy_end_date = st.date_input(&quot;Policy end date :&quot;)</span>
+
+<span class="s1">selected_claim_amount </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">number_input</span><span class="s2">(</span><span class="s3">'Enter claim amount (₦) :'</span><span class="s2">,</span>
+                               <span class="s1">min_value</span><span class="s2">=</span><span class="s4">0.00</span><span class="s2">,</span>
+                               <span class="s1">value</span><span class="s2">=</span><span class="s4">0.00</span><span class="s2">,</span>
+                               <span class="s1">step</span><span class="s2">=</span><span class="s4">0.01</span><span class="s2">,</span>
+                               <span class="s1">format</span><span class="s2">=</span><span class="s3">&quot;%.2f&quot;</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">&quot;Claim amount entered : ₦&quot;</span><span class="s2">, </span><span class="s1">selected_claim_amount</span><span class="s2">)</span>
+
+<span class="s5"># Creating filters</span>
+<span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">df</span><span class="s2">.</span><span class="s1">copy</span><span class="s2">()</span>
+
+<span class="s0">if </span><span class="s1">selected_loc </span><span class="s2">!= </span><span class="s3">'--Select--'</span><span class="s2">:</span>
+    <span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s3">'Location'</span><span class="s2">] == </span><span class="s1">selected_loc</span><span class="s2">]</span>
+<span class="s0">if </span><span class="s1">selected_pt </span><span class="s2">!= </span><span class="s3">'--Select--'</span><span class="s2">:</span>
+    <span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s3">'Policy_Type'</span><span class="s2">] == </span><span class="s1">selected_pt</span><span class="s2">]</span>
+<span class="s0">if </span><span class="s1">selected_ct </span><span class="s2">!= </span><span class="s3">'--Select--'</span><span class="s2">:</span>
+    <span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s3">'Claim_Type'</span><span class="s2">] == </span><span class="s1">selected_ct</span><span class="s2">]</span>
+<span class="s0">if </span><span class="s1">selected_it </span><span class="s2">!= </span><span class="s3">'--Select--'</span><span class="s2">:</span>
+    <span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s3">'Incident_Type'</span><span class="s2">] == </span><span class="s1">selected_it</span><span class="s2">]</span>
+<span class="s0">if </span><span class="s1">selected_customer_gender </span><span class="s2">!= </span><span class="s3">'--Select--'</span><span class="s2">:</span>
+    <span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s3">'Customer_Gender'</span><span class="s2">] == </span><span class="s1">selected_customer_gender</span><span class="s2">]</span>
+<span class="s0">if </span><span class="s1">selected_customer_age </span><span class="s2">== </span><span class="s4">0</span><span class="s2">:</span>
+    <span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s3">'Customer_Age'</span><span class="s2">] == </span><span class="s1">selected_customer_age</span><span class="s2">]</span>
+<span class="s0">if </span><span class="s1">selected_customer_occupation </span><span class="s2">!= </span><span class="s3">'--Select--'</span><span class="s2">:</span>
+    <span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s3">'Customer_Occupation'</span><span class="s2">] == </span><span class="s1">selected_customer_occupation</span><span class="s2">]</span>
+<span class="s0">if </span><span class="s1">selected_claim_status </span><span class="s2">!= </span><span class="s3">'--Select--'</span><span class="s2">:</span>
+    <span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s3">'Claim_Status'</span><span class="s2">] == </span><span class="s1">selected_claim_status</span><span class="s2">]</span>
+<span class="s0">if </span><span class="s1">selected_premium_amount</span><span class="s2">:</span>
+    <span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s3">'Premium_Amount'</span><span class="s2">] == </span><span class="s1">selected_premium_amount</span><span class="s2">]</span>
+<span class="s0">if </span><span class="s1">selected_claim_amount</span><span class="s2">:</span>
+    <span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s1">filtered_df</span><span class="s2">[</span><span class="s3">'Claim_Amount'</span><span class="s2">] == </span><span class="s1">selected_claim_amount</span><span class="s2">]</span>
+<span class="s5">#if selected_incident_date != '--Select--':</span>
+    <span class="s5">#filtered_df = filtered_df[filtered_df['Incident_Type'] == selected_incident_date]</span>
+<span class="s5">#if selected_claim_submission_date != '--Select--':</span>
+    <span class="s5">#filtered_df = filtered_df[filtered_df['Claim_Submission_Date'] == selected_claim_submission_date]</span>
+<span class="s5">#if selected_policy_start_date != '--Select--':</span>
+    <span class="s5">#filtered_df = filtered_df[filtered_df['Policy_Start_Date'] == selected_policy_start_date]</span>
+<span class="s5">#if selected_policy_end_date != '--Select--':</span>
+    <span class="s5">#filtered_df = filtered_df[filtered_df['Policy_End_Date'] == selected_policy_end_date]</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">divider</span><span class="s2">()</span>
+
+<span class="s1">filter_button </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">&quot;###### Filtered claims data :&quot;</span><span class="s2">)</span>
+<span class="s0">if </span><span class="s1">filter_button </span><span class="s0">not in </span><span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">:</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">.</span><span class="s1">filter_button </span><span class="s2">= </span><span class="s0">True</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">dataframe</span><span class="s2">(</span><span class="s1">filtered_df</span><span class="s2">)</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">divider</span><span class="s2">()</span>
+
+<span class="s5"># Filter claims data with policy number</span>
+<span class="s1">policy_number </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Number'</span><span class="s2">].</span><span class="s1">unique</span><span class="s2">()</span>
+<span class="s1">selected_id </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">selectbox</span><span class="s2">(</span>
+    <span class="s3">&quot;Select or enter policy number manually to filter customer claim data. This parameter selects a row from the table.&quot;</span><span class="s2">,</span>
+    <span class="s1">policy_number</span><span class="s2">)</span>
+<span class="s1">filtered_df </span><span class="s2">= </span><span class="s1">df</span><span class="s2">[</span><span class="s1">df</span><span class="s2">[</span><span class="s3">'Policy_Number'</span><span class="s2">] == </span><span class="s1">selected_id</span><span class="s2">]</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">'###### Filtered claim data by Policy ID :'</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">dataframe</span><span class="s2">(</span><span class="s1">filtered_df</span><span class="s2">)</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">divider</span><span class="s2">()</span>
+
+<span class="s5"># Create show claims data button</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">&quot;###### Click the button below to show uploaded claims data&quot;</span><span class="s2">)</span>
+<span class="s1">df </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">read_csv</span><span class="s2">(</span><span class="s1">filepath</span><span class="s2">)</span>
+<span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Show Uploaded Claims Data&quot;</span><span class="s2">):</span>
+    <span class="s1">report </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s1">df</span><span class="s2">)</span>
+
+<span class="s5"># Create hide data button</span>
+<span class="s0">if </span><span class="s3">&quot;Show Claims Data&quot; </span><span class="s0">not in </span><span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">:</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">.</span><span class="s1">show_button </span><span class="s2">= </span><span class="s0">True</span>
+<span class="s0">def </span><span class="s1">hide_session_state</span><span class="s2">():</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">.</span><span class="s1">show_button </span><span class="s2">= </span><span class="s0">False</span>
+<span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">.</span><span class="s1">show_button</span><span class="s2">:</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Hide Claims Data&quot;</span><span class="s2">, </span><span class="s1">on_click</span><span class="s2">=</span><span class="s1">hide_session_state</span><span class="s2">)</span>
+<span class="s0">else</span><span class="s2">:</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">&quot;Hide Claims Data&quot;</span><span class="s2">)</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">divider</span><span class="s2">()</span>
+
+<span class="s5"># np.array(filtered_df[{</span>
+<span class="s5"># Create button to trigger prediction</span>
+<span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Check Claim Prediction&quot;</span><span class="s2">):</span>
+    <span class="s1">input_data </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">DataFrame</span><span class="s2">([{</span>
+        <span class="s3">'Location' </span><span class="s2">: </span><span class="s1">selected_loc</span><span class="s2">,</span>
+        <span class="s3">'Policy_Type' </span><span class="s2">: </span><span class="s1">selected_pt</span><span class="s2">,</span>
+        <span class="s3">'Claim_Type' </span><span class="s2">: </span><span class="s1">selected_ct</span><span class="s2">,</span>
+        <span class="s3">'Incident_Type' </span><span class="s2">: </span><span class="s1">selected_it</span><span class="s2">,</span>
+        <span class="s3">'Customer_Age'</span><span class="s2">: </span><span class="s1">selected_customer_age</span><span class="s2">,</span>
+        <span class="s3">'Customer_Gender' </span><span class="s2">: </span><span class="s1">selected_customer_gender</span><span class="s2">,</span>
+        <span class="s3">'Customer_Occupation' </span><span class="s2">: </span><span class="s1">selected_customer_occupation</span><span class="s2">,</span>
+        <span class="s3">'Claim_Status' </span><span class="s2">: </span><span class="s1">selected_claim_status</span><span class="s2">,</span>
+        <span class="s3">'Premium_Amount' </span><span class="s2">: </span><span class="s1">selected_premium_amount</span><span class="s2">,</span>
+        <span class="s3">'Claim_Amount' </span><span class="s2">: </span><span class="s1">selected_claim_amount</span>
+        <span class="s2">}])</span>
+
+    <span class="s1">prediction </span><span class="s2">= </span><span class="s1">model</span><span class="s2">.</span><span class="s1">predict</span><span class="s2">(</span><span class="s1">input_data</span><span class="s2">)[</span><span class="s4">0</span><span class="s2">]</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">f&quot;##### Claim prediction result :  '</span><span class="s0">{</span><span class="s1">int</span><span class="s2">(</span><span class="s1">prediction</span><span class="s2">)</span><span class="s0">}</span><span class="s3">'&quot;</span><span class="s2">)</span>
+
+    <span class="s0">if </span><span class="s1">prediction </span><span class="s2">== </span><span class="s4">1</span><span class="s2">:</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">error</span><span class="s2">(</span><span class="s3">'⚠️ Fraud alert : Potential fraudulent claim has been detected. Please, exercise due diligence.'</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">warning</span><span class="s2">(</span><span class="s3">'❌ Info : This claim transaction has been flagged for further reviews.'</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">'- Refresh page to enter another claim data to make prediction'</span><span class="s2">)</span>
+    <span class="s0">else</span><span class="s2">:</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">success</span><span class="s2">(</span><span class="s3">'✅ Claim transaction passed credibility check.'</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">success</span><span class="s2">(</span><span class="s3">'🔍 After careful analysis, transaction is presumed legitimate for approval and further processing.'</span><span class="s2">)</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">'- Refresh page to enter another claim data to make prediction.'</span><span class="s2">)</span>
+
+<span class="s3">'''if selected_claim_amount == 0.00: 
+    st.write('Please, input claim amount.')'''</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">divider</span><span class="s2">()</span>
+
+<span class="s5"># ...............................Space for API requests</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">&quot;###### Claim Approval/Authorization Status&quot;</span><span class="s2">)</span>
+<span class="s1">claim_status_2 </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">selectbox</span><span class="s2">(</span><span class="s3">'Approve, reject, deny or flag claim request :'</span><span class="s2">, [</span><span class="s3">'Approved'</span><span class="s2">, </span><span class="s3">'Rejected'</span><span class="s2">,</span>
+                                                                                <span class="s3">'Denied'</span><span class="s2">, </span><span class="s3">'Flagged'</span><span class="s2">])</span>
+<span class="s1">comment </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">text_area</span><span class="s2">(</span><span class="s3">'Comment (Reason for comment) :'</span><span class="s2">)</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s3">&quot;###### Review the following document&quot;</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">text_area</span><span class="s2">(</span><span class="s3">&quot;Document content :&quot;</span><span class="s2">, </span><span class="s3">&quot;Content of document requiring approval.&quot;</span><span class="s2">, </span><span class="s1">height</span><span class="s2">=</span><span class="s4">200</span><span class="s2">)</span>
+
+<span class="s1">col1</span><span class="s2">, </span><span class="s1">col2</span><span class="s2">, </span><span class="s1">col3</span><span class="s2">, </span><span class="s1">col4</span><span class="s2">, </span><span class="s1">col5 </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">columns</span><span class="s2">(</span><span class="s4">5</span><span class="s2">)</span>
+<span class="s0">with </span><span class="s1">col1</span><span class="s2">:</span>
+    <span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Approve&quot;</span><span class="s2">):</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">success</span><span class="s2">(</span><span class="s3">&quot;Document Approved&quot;</span><span class="s2">)</span>
+        <span class="s5"># Add logic here to update approval status in a database</span>
+        <span class="s5"># or trigger an approval workflow.</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">.</span><span class="s1">status </span><span class="s2">= </span><span class="s3">&quot;Approved&quot;</span>
+<span class="s0">with </span><span class="s1">col2</span><span class="s2">:</span>
+    <span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Reject&quot;</span><span class="s2">):</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">info</span><span class="s2">(</span><span class="s3">&quot;Document Rejected&quot;</span><span class="s2">)</span>
+        <span class="s5"># Add logic here to update approval status in a database</span>
+        <span class="s5"># or trigger a rejection workflow.</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">.</span><span class="s1">status </span><span class="s2">= </span><span class="s3">&quot;Rejected&quot;</span>
+<span class="s0">with </span><span class="s1">col3</span><span class="s2">:</span>
+    <span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Deny&quot;</span><span class="s2">):</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">info</span><span class="s2">(</span><span class="s3">&quot;Document Denied&quot;</span><span class="s2">)</span>
+        <span class="s5"># Add logic here to update approval status in a database</span>
+        <span class="s5"># or trigger an approval workflow.</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">.</span><span class="s1">status </span><span class="s2">= </span><span class="s3">&quot;Denied&quot;</span>
+<span class="s0">with </span><span class="s1">col4</span><span class="s2">:</span>
+    <span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Flag&quot;</span><span class="s2">):</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">info</span><span class="s2">(</span><span class="s3">&quot;Document Flagged&quot;</span><span class="s2">)</span>
+        <span class="s5"># Add logic here to update approval status in a database</span>
+        <span class="s5"># or trigger an approval workflow.</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">.</span><span class="s1">status </span><span class="s2">= </span><span class="s3">&quot;Flagged&quot;</span>
+<span class="s0">with </span><span class="s1">col5</span><span class="s2">:</span>
+    <span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s3">&quot;Awaiting Decision&quot;</span><span class="s2">):</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">info</span><span class="s2">(</span><span class="s3">&quot;Document Awaiting Decision&quot;</span><span class="s2">)</span>
+        <span class="s5"># Add logic here to update approval status in a database</span>
+        <span class="s5"># or trigger an approval workflow.</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">.</span><span class="s1">status </span><span class="s2">= </span><span class="s3">&quot;Document awaiting decision until confirmed.&quot;</span>
+
+<span class="s0">if </span><span class="s3">&quot;status&quot; </span><span class="s0">in </span><span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">:</span>
+    <span class="s1">st</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s3">f&quot;Current Status : </span><span class="s0">{</span><span class="s1">st</span><span class="s2">.</span><span class="s1">session_state</span><span class="s2">.</span><span class="s1">status</span><span class="s0">}</span><span class="s3">&quot;</span><span class="s2">)</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">divider</span><span class="s2">()</span>
+
+<span class="s5"># Make API calls: Use requests to make GET, POST, PUT, DELETE, or other HTTP requests as needed.</span>
+<span class="s5"># For example, to fetch data from a public API</span>
+<span class="s5"># Example GET request</span>
+<span class="s3">'''url = &quot;https://jsonplaceholder.typicode.com/todos/1&quot; 
+response = requests.get(url) 
+data = response.json() 
+st.write(&quot;Data from API:&quot;) 
+st.write(data) 
+ 
+# Handle user input and display results: Integrate requests calls with Streamlit widgets to allow user interaction. 
+# For instance, you could have a button that triggers an API call and then displays the results 
+#if st.button(&quot;Fetch New Data&quot;): 
+new_data_url = &quot;https://api.example.com/some_endpoint&quot; 
+try: 
+    new_response = requests.get(new_data_url) 
+    new_data = new_response.json() 
+    st.write(&quot;Newly fetched data:&quot;) 
+    st.write(new_data) 
+except requests.exceptions.RequestException as e: 
+        st.error(f&quot;Error fetching data: {e}&quot;) 
+ 
+# Manage secrets (for API keys): If your API calls require API keys or other sensitive information 
+# Use Streamlit's secrets management to securely store and access them 
+# In your .streamlit/secrets.toml file: 
+my_api_key = &quot;your_api_key_here&quot; 
+ 
+# In your Streamlit app: 
+api_key = st.secrets[&quot;my_api_key&quot;] 
+headers = {&quot;Authorization&quot;: f&quot;Bearer {api_key}&quot;}'''</span>
+
+<span class="s5"># ... then use headers in your requests.get() or requests.post() calls</span>
+
+<span class="s5"># EMAIL NOTIFICATION TO CUSTOMERS (TIMESTAMP)</span></pre>
+</body>
+</html>
