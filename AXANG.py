@@ -1,15 +1,15 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from altair.vegalite.v5.theme import theme
-from jinja2.nodes import Slice
+#import numpy as np
+#import matplotlib.pyplot as plt
+#import seaborn as sns
+#from altair.vegalite.v5.theme import theme
+#from jinja2.nodes import Slice
 
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
-from sklearn import metrics
+#from sklearn.linear_model import LogisticRegression
+#from sklearn.svm import SVC
+#from sklearn.ensemble import RandomForestClassifier
+#from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, f1_score, precision_score, \
     recall_score
