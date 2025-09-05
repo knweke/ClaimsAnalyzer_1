@@ -3,7 +3,6 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-from scipy.stats import zscore
 from PIL import Image
 from io import StringIO
 import requests
@@ -177,11 +176,11 @@ if auth_success:
         st.write(f"- Customers with greater than 3 claims: {len(frequent_customers)}")
         st.dataframe(frequent_customers)
 
-        st.subheader("Z-Score Anomaly Detection")
-        df['z_score'] = zscore(df['Claim_Amount'])
-        anomalies = df[df['z_score'].abs() > 3]
-        st.write(f"- Anomalous claims (Z > 3): {len(anomalies)}")
-        st.dataframe(anomalies)
+        #st.subheader("Z-Score Anomaly Detection")
+        #df['z_score'] = zscore(df['Claim_Amount'])
+        #anomalies = df[df['z_score'].abs() > 3]
+        #st.write(f"- Anomalous claims (Z > 3): {len(anomalies)}")
+        #st.dataframe(anomalies)
 
         if 'Claim_Type' in df.columns:
             st.subheader("Cost Center Analysis")
