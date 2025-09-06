@@ -54,5 +54,3 @@ tzdata==2024.2
 urllib3==2.2.3
 watchdog==4.0.2
 xgboost==2.1.1
-streamlit_option_menu
-option_menu
