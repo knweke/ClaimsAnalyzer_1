@@ -12,9 +12,7 @@ import json
 import requests
 from fpdf import FPDF
 import os
-
 from xgboost.testing.data import joblib
-
 from ClaimsAppModel import pipeline
 
 filepath = 'C:\\Users\\Springrose\\Downloads\\FRAUD DETECTION\\Smart Claims Data.csv'
