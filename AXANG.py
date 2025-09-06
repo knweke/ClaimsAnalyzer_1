@@ -6,13 +6,14 @@ import pandas as pd
 from PIL import Image
 from io import StringIO
 import requests
-import joblib
 from streamlit_option_menu import option_menu
 import base64
 import json
 import requests
 from fpdf import FPDF
 import os
+
+from xgboost.testing.data import joblib
 
 from ClaimsAppModel import pipeline
 
@@ -176,11 +177,11 @@ if auth_success:
         st.write(f"- Customers with greater than 3 claims: {len(frequent_customers)}")
         st.dataframe(frequent_customers)
 
-        #st.subheader("Z-Score Anomaly Detection")
-        #df['z_score'] = zscore(df['Claim_Amount'])
-        #anomalies = df[df['z_score'].abs() > 3]
-        #st.write(f"- Anomalous claims (Z > 3): {len(anomalies)}")
-        #st.dataframe(anomalies)
+        st.subheader("Z-Score Anomaly Detection")
+        df['z_score'] = zscore(df['Claim_Amount'])
+        anomalies = df[df['z_score'].abs() > 3]
+        st.write(f"- Anomalous claims (Z > 3): {len(anomalies)}")
+        st.dataframe(anomalies)
 
         if 'Claim_Type' in df.columns:
             st.subheader("Cost Center Analysis")
@@ -519,8 +520,6 @@ st.divider()
 
 # This space will be used to make API calls
 # This space will also be used to invoke requests to make GET, POST, PUT, DELETE, or other HTTP requests as needed
-# To fetch data from a public API
-# GET request
 # Code samples that will be used for API calls and requests
 
 #url = "https://jsonplaceholder.typicode.com/todos/1"
@@ -529,8 +528,9 @@ st.divider()
 #st.write("Data from API:")
 #st.write(data)
 
-# Handle user input and display results: Integrate requests calls with Streamlit widgets to allow user interaction.
+# This space will handle user input and display results: Integrate requests calls with Streamlit widgets to allow user interaction.
 # For instance, you could have a button that triggers an API call and then displays the results
+
 #if st.button("Fetch New Data"):
 
 #new_data_url = "https://api.example.com/some_endpoint"
@@ -542,7 +542,8 @@ st.divider()
 #except requests.exceptions.RequestException as e:
         #st.error(f"Error fetching data: {e}")
 
-# Manage secrets (for API keys): If your API calls require API keys or other sensitive information
+# This space will be used to manage secrets (for API keys)
+# If your API calls require API keys or other sensitive information
 # Use Streamlit's secrets management to securely store and access them
 # In your .streamlit/secrets.toml file:
 
