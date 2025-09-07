@@ -1,7 +1,6 @@
 altair==5.4.1
 attrs==24.2.0
 blinker==1.8.2
-base64==1.4.2
 cachetools==5.5.0
 certifi==2024.8.30
 charset-normalizer==3.3.2
@@ -56,9 +55,9 @@ tzdata==2024.2
 urllib3==2.2.3
 watchdog==4.0.2
 xgboost==2.1.1
-fpdf==1.7.2
+fpdf==1.52.1
 Pytest==8.4.2
 iniconfig==2.1.0
 pluggy==1.6.0
 pygments==2.19.2
-FPDF==1.7.2
+FPDF==1.52.1
