@@ -57,5 +57,6 @@ watchdog==4.0.2
 xgboost==2.1.1
 fpdf==1.7.2
 Pytest==8.4.2
-
-
+iniconfig==2.1.0 
+pluggy==1.6.0 
+pygments==2.19.2  
