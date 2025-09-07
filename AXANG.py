@@ -325,6 +325,7 @@ customer_occupation = list(df['Customer_Occupation'].unique())
 claim_status = list(df['Claim_Status'].unique())
 premium_amount = df['Premium_Amount']
 claim_amount = df['Claim_Amount']
+policy_no = list(df['Policy_Number'].unique())
 #incident_date = list(df['Incident_Date'])
 #claim_submission_date = list(df['Claim_Submission_Date'])
 #policy_start_date = list(df['Policy_Start_Date'])
@@ -356,6 +357,7 @@ selected_claim_amount = st.number_input('Enter claim amount (₦) :',
                                step=0.01,
                                format="%.2f")
 st.write("Claim amount entered : ₦", selected_claim_amount)
+selected_pn = st.selectbox("Policy ID :", options=policy_no)
 
 # Creating filters
 filtered_df = df.copy()
@@ -466,8 +468,8 @@ claim_status_2 = st.selectbox('Approve, reject, deny or flag claim request :', [
                                                                                 'Denied', 'Flagged'])
 comment = st.text_area('Comment (Reason for comment) :')
 
-st.markdown("###### Document Reviewal")
-st.text_area("Document content :", "Claim documentation requiring approval.", height=200)
+st.markdown("###### Document Review Section")
+review = st.text_area("Claim documentation remark(s) :")
 
 col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
@@ -510,7 +512,22 @@ with st.form(key='my_form'):
     submit_button = st.form_submit_button(label='Submit Claim Request')
 
 if submit_button:
-    st.write(f"Location: {selected_loc}, Policy type: {selected_pt}, Claim type: {selected_ct}, Incident type: {selected_it}, Customer age: {selected_customer_age}, Customer gender: {selected_customer_gender}, Customer occupation: {selected_customer_occupation}, Claim status: {selected_claim_status}, Premium amount: {selected_premium_amount}, Claim amount: {selected_claim_amount}, Authorization: {claim_status_2}, Comment: {comment}, Current Status: {st.session_state.status}")
+    #st.write(f"Location: {selected_loc}, Policy type: {selected_pt}, Claim type: {selected_ct}, Incident type: {selected_it}, Customer age: {selected_customer_age}, Customer gender: {selected_customer_gender}, Customer occupation: {selected_customer_occupation}, Claim status: {selected_claim_status}, Premium amount: {selected_premium_amount}, Claim amount: {selected_claim_amount}, Authorization: {claim_status_2}, Comment: {comment}, Current Status: {st.session_state.status}")
+    st.write(f"- Policy ID: {selected_pn}")
+    st.write(f"- Location: {selected_loc}")
+    st.write(f"- Policy type: {selected_pt}")
+    st.write(f"- Claim type: {selected_ct}")
+    st.write(f"- Incident type: {selected_it}")
+    st.write(f"- Customer age: {selected_customer_age}")
+    st.write(f"- Customer gender: {selected_customer_gender}")
+    st.write(f"- Customer occupation: {selected_customer_occupation}")
+    #st.write(f"- Claim status: {selected_claim_status}")
+    st.write(f"- Premium amount: {selected_premium_amount}")
+    st.write(f"- Claim amount: {selected_claim_amount}")
+    st.write(f"- Authorization: {claim_status_2}")
+    st.write(f"- Comment: {comment}")
+    st.write(f"- Document review: {review}")
+    st.write(f"- Current Status: {st.session_state.status}")
 
 st.divider()
 
