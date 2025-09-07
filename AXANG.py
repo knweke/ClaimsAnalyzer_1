@@ -6,6 +6,7 @@ import pandas as pd
 from PIL import Image
 from io import StringIO
 import requests
+from scipy.stats import zscore
 from streamlit_option_menu import option_menu
 import base64
 import json
@@ -311,7 +312,53 @@ else:
 
 st.divider()
 
-st.markdown("###### Select any option below to filter claims data")
+# Use a form to group input widgets and a submit button
+with st.form(key="claim_form"):
+    st.write("Enter a policy number manually to search and view claim details")
+    policy_number_input = st.text_input(
+        "Policy Number :",
+        help="e.g., POL6048764, POL7285232"
+    ).upper() # Convert input to uppercase to match DataFrame
+
+    submit_button = st.form_submit_button("Search")
+
+    # Logic to handle the form submission
+    if submit_button:
+        if policy_number_input:
+            # Filter the DataFrame based on the user's input
+            filtered_df = df[df['Policy_Number'] == policy_number_input]
+
+            if not filtered_df.empty:
+                st.success(f"Found {len(filtered_df)} claim(s) for Policy ID: **{policy_number_input}**")
+                st.dataframe(filtered_df, use_container_width=True)
+            else:
+                st.warning(f"No claim(s) found for Policy ID: **{policy_number_input}**")
+        else:
+            st.error("Please enter a policy number to search.")
+
+# Get a list of unique policy numbers to use as options for the select box
+policy_numbers = sorted(df['Policy_Number'].unique())
+
+# Add a "Select All" or placeholder option for the select box
+policy_numbers.insert(0, 'Select a policy...')
+
+# Create the select box widget
+selected_policy_number = st.selectbox(
+    "Select a policy number from the list to view claim details :",
+    options=policy_numbers
+)
+
+# Logic to display data only after a valid policy is selected
+if selected_policy_number and selected_policy_number != 'Select a policy...':
+    # Filter the DataFrame based on the user's selection
+    filtered_df = df[df['Policy_Number'] == selected_policy_number]
+
+    st.success(f"Found {len(filtered_df)} claim(s) for Policy ID: **{selected_policy_number}**")
+    st.dataframe(filtered_df, use_container_width=True)
+elif selected_policy_number == 'Select a policy...':
+    st.info("View selected claim details")
+
+st.markdown("###### Select available options below to filter selected claim data for predictive analysis")
 
 # Filter claims data with select boxes
 # Get unique options for each filter
@@ -391,12 +438,12 @@ if selected_claim_amount:
 #if selected_policy_end_date != '--Select--':
     #filtered_df = filtered_df[filtered_df['Policy_End_Date'] == selected_policy_end_date]
 
-st.divider()
+#st.divider()
 
-filter_button = st.markdown("###### Filtered claims data :")
-if filter_button not in st.session_state:
-    st.session_state.filter_button = True
-    st.dataframe(filtered_df)
+#filter_button = st.markdown("###### Filtered claims data :")
+#if filter_button not in st.session_state:
+    #st.session_state.filter_button = True
+    #st.dataframe(filtered_df)
 
 st.divider()
 
@@ -430,7 +477,7 @@ else:
 st.divider()
 
 # Create button to trigger prediction
-if st.button("Check Claim Prediction"):
+if st.button("View Prediction Result"):
     input_data = pd.DataFrame([{
         'Location' : selected_loc,
         'Policy_Type' : selected_pt,
@@ -445,7 +492,7 @@ if st.button("Check Claim Prediction"):
         }])
 
     if selected_claim_amount == 0.00:
-        st.info('Claim amount must be greater than 0. To get accurate prediction result, enter claim amount.')
+        st.info('Claim amount must be greater than 0. To get accurate prediction result, please enter selected claim details.')
 
     prediction = model.predict(input_data)[0]
     st.markdown(f"##### Claim prediction result : '{int(prediction)}'")
@@ -507,7 +554,7 @@ if "status" in st.session_state:
     st.write(f"Current Status : {st.session_state.status}")
 
 # Creating a button that triggers an API call and then displays the input results using internet connection and API services
-with st.form(key='my_form'):
+with st.form(key='claims_form'):
     # Create the submit button
     submit_button = st.form_submit_button(label='Submit Claim Request')
 
