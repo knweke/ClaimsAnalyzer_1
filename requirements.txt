@@ -60,3 +60,4 @@ iniconfig==2.1.0
 pluggy==1.6.0
 pygments==2.19.2
 FPDF==1.52.1
+fpdf==1.7.2
