@@ -504,8 +504,6 @@ with col5:
 if "status" in st.session_state:
     st.write(f"Current Status : {st.session_state.status}")
 
-st.divider()
-
 # Creating a button that triggers an API call and then displays the input results using internet connection and API services
 with st.form(key='my_form'):
     # Create the submit button
