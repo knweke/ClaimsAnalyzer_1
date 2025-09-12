@@ -1,0 +1,60 @@
+{
+    "https://placehold.co/800x600/FF5733/FFFFFF?text=Abstract+Art": {
+        "likes": 0,
+        "comments": []
+    },
+    "https://placehold.co/800x600/33FF57/FFFFFF?text=Landscape+Painting": {
+        "likes": 0,
+        "comments": []
+    },
+    "https://placehold.co/800x600/3357FF/FFFFFF?text=Digital+Illustration": {
+        "likes": 7,
+        "comments": [
+            "uybuyg8bj",
+            "JK,,"
+        ]
+    },
+    "https://placehold.co/800x600/FF33A1/FFFFFF?text=Portrait+Sketch": {
+        "likes": 0,
+        "comments": []
+    },
+    "https://placehold.co/800x600/A1FF33/FFFFFF?text=Modern+Sculpture": {
+        "likes": 1,
+        "comments": []
+    },
+    "https://placehold.co/600x800/FF5733/FFFFFF?text=Abstract+Art": {
+        "likes": 1,
+        "comments": []
+    },
+    "https://placehold.co/600x800/33FF57/FFFFFF?text=Landscape+Painting": {
+        "likes": 15,
+        "comments": [
+            "yuilkljkj",
+            "djgyjy"
+        ]
+    },
+    "https://placehold.co/600x800/FF33A1/FFFFFF?text=Portrait+Sketch": {
+        "likes": 5,
+        "comments": [
+            "gfvinoi"
+        ]
+    },
+    "http://localhost:8501/media/93ba168b62a242b45af192c12785cac486c646ddef24653ef9e3fdcb.png": {
+        "likes": 31,
+        "comments": [
+            "hgdf89h",
+            "nkn",
+            "uiuy"
+        ]
+    },
+    "https://placehold.co/600x800/3357FF/FFFFFF?text=Digital+Illustration": {
+        "likes": 12,
+        "comments": [
+            "fdjbfdkn"
+        ]
+    },
+    "https://placehold.co/600x800/A1FF33/FFFFFF?text=Modern+Sculpture": {
+        "likes": 1,
+        "comments": []
+    }
+}

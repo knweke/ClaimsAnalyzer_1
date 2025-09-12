@@ -506,7 +506,7 @@ if st.button("View Prediction Result"):
         st.success('🔍 After careful analysis, transaction is presumed legitimate for approval and further processing.')
         #st.write('- Refresh page to enter another claim data to make prediction.')
 
-st.info(f"Disclaimer: Prediction result is made by a Machine Learning model and might require further validation to ensure its accuracy.")
+st.info(f"Disclaimer: Prediction is made by a Machine Learning model and might require further validation to ensure its accuracy.")
 
 st.divider()
 
