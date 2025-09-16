@@ -11,7 +11,6 @@ from streamlit_option_menu import option_menu
 import base64
 import json
 import requests
-from fpdf import FPDF
 import os
 from xgboost.testing.data import joblib
 from ClaimsAppModel import pipeline
@@ -95,19 +94,6 @@ def save_user(username, password):
     # Save the updated users list back to CSV
     users.to_csv("users.csv", index=False)
     return True
-
-# ---- PDF Generator ----
-def generate_pdf_report(data_summary):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=14)
-    pdf.cell(200, 10, txt="Claims Analysis Report", ln=True, align='C')
-    pdf.ln(10)
-    for line in data_summary:
-        pdf.multi_cell(0, 10, line)
-    filename = "claims_report.pdf"
-    pdf.output(filename)
-    return filename
 
 # ---- Sidebar: Login/Register ----
 st.sidebar.title("🔐 User Authentication")
