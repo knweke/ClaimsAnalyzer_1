@@ -477,6 +477,7 @@ else:
 st.divider()
 
 # Create button to trigger prediction
+st.write(f"Note: Make sure you enter the selected claim details correctly. If otherwise, default claim prediction result is '0'.")
 if st.button("View Prediction Result"):
     input_data = pd.DataFrame([{
         'Location' : selected_loc,
@@ -494,17 +495,28 @@ if st.button("View Prediction Result"):
     if selected_claim_amount == 0.00:
         st.info('Claim amount must be greater than 0. To get accurate prediction result, please enter selected claim details.')
 
+    # 'if' condition to predict if a claim is fraudulent (1) or not (0).
+    threshold = 300000
+
+    # Default claim prediction result : '0'
     prediction = model.predict(input_data)[0]
     st.markdown(f"##### Claim prediction result : '{int(prediction)}'")
 
+    # Initialize the prediction variable
+    if prediction:
+        if selected_claim_amount > threshold:
+            st.warning(f"The claim amount of ₦{selected_claim_amount:,} is above the payment threshold of ₦{threshold:,} and is flagged as potentially fraudulent.")
+        else:
+            st.info(f"The claim amount of ₦{selected_claim_amount:,} falls within the payment threshold.")
+
     if prediction == 1:
-        st.error('⚠️ Fraud alert : Potential fraudulent claim has been detected. Please, exercise due diligence.')
-        st.warning('❌ Info : This claim transaction has been flagged for further reviews.')
-        #st.write('- Refresh page to enter another claim data to make prediction')
+        st.error('⚠️ Fraud alert : Potentially fraudulent claim has been detected. Please, exercise due diligence.')
+        st.warning('❌ Remark : This claim transaction has been flagged as suspicious for further reviews.')
     else:
         st.success('✅ Claim transaction passed credibility check.')
         st.success('🔍 After careful analysis, transaction is presumed legitimate for approval and further processing.')
-        #st.write('- Refresh page to enter another claim data to make prediction.')
+
+st.divider()
 
 st.info(f"Disclaimer: Prediction is made by a Machine Learning model and might require further validation to ensure its accuracy.")
 
