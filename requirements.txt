@@ -60,5 +60,3 @@ Pytest==8.4.2
 iniconfig==2.1.0
 pluggy==1.6.0
 pygments
-FPDF
-fpdf
