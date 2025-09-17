@@ -478,7 +478,7 @@ else:
 st.divider()
 
 # Create button to trigger prediction
-st.write(f"Make sure you enter the selected claim details correctly. If otherwise, default prediction result will return '0'.")
+st.write(f"Make sure to enter the selected claim details correctly. If otherwise, default prediction result will return '0'.")
 if st.button("View Prediction Result"):
     input_data = pd.DataFrame([{
         'Location' : selected_loc,
@@ -508,14 +508,15 @@ if st.button("View Prediction Result"):
     if prediction:
         if selected_claim_amount > threshold:
             st.warning(f"The claim amount of ₦{selected_claim_amount:,} is above the payment threshold of ₦{threshold:,} and is flagged as potentially fraudulent.")
-        else:
+    else:
+        if selected_claim_amount < threshold:
             st.info(f"The claim amount of ₦{selected_claim_amount:,} falls within the payment threshold of ₦{threshold:,}.")
 
     if prediction == 1:
         st.error('⚠️ Fraud alert : Potentially fraudulent claim has been detected. Please, exercise due diligence.')
         st.warning('❌ Remark : This claim transaction has been flagged as suspicious and requires further review.')
     else:
-        st.success('✅ Claim transaction passed credibility check.')
+        st.success('✅ Claim payout request passed credibility check.')
         st.success('🔍 After careful analysis, transaction is presumed legitimate for approval and further processing.')
 
 st.divider()
