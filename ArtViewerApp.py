@@ -1,14 +1,16 @@
 import sys
 import json
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QTextEdit, QSizePolicy
+from PyQt5.QtWidgets import (QApplication, QMainWindow,
+                             QWidget, QVBoxLayout, QHBoxLayout,
+                             QPushButton, QLabel, QTextEdit, QSizePolicy)
 from PyQt5.QtGui import QFont, QColor, QPixmap
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # Configuration and Data
 IMAGE_URLS = [
-    "http://localhost:8501/media/93ba168b62a242b45af192c12785cac486c646ddef24653ef9e3fdcb.png",
+    "https://naijasteed.blogspot.com/2025/09/art-7.html",
     "https://placehold.co/600x800/33FF57/FFFFFF?text=Landscape+Painting",
     "https://placehold.co/600x800/3357FF/FFFFFF?text=Digital+Illustration",
     "https://placehold.co/600x800/FF33A1/FFFFFF?text=Portrait+Sketch",
@@ -20,7 +22,7 @@ DATA_FILE = "art_data.json"
 class ArtViewerApp(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Jopper - A Colorful Art Viewer")
+        self.setWindowTitle("Jopper - A Colorful Art Viewer Inspired By AI")
         self.setGeometry(50, 50, 400, 600)
         self.setStyleSheet("background-color: #1a202c; color: #e2e8f0;")
 
@@ -54,22 +56,43 @@ class ArtViewerApp(QMainWindow):
         self.setCentralWidget(main_widget)
 
         main_layout = QVBoxLayout(main_widget)
-        main_layout.setContentsMargins(23, 23, 23, 23)
+        main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(8)
 
-        # Title Label 1
-        title_label = QLabel("Jopper")
-        title_label.setAlignment(Qt.AlignCenter)
-        title_label.setFont(QFont("Inter", 25, QFont.Bold))
-        title_label.setStyleSheet("color: #FBBF24;")
-        main_layout.addWidget(title_label)
+        # Logo Section
+        '''logo_layout = QVBoxLayout()
+        self.logo_label = QLabel()
+        self.logo_label.setFixedSize(50, 50)
+        self.logo_label.setAlignment(Qt.AlignCenter)
+        self.logo_label.setStyleSheet("border-radius: 75px;")
 
-        # Title Label 2
+        upload_logo_button = self.create_button("Upload Logo", self.upload_logo,
+                                                "#9F7AEA", "#805AD5")
+        logo_layout.addWidget(self.logo_label)
+        logo_layout.addWidget(upload_logo_button, alignment=Qt.AlignCenter | Qt.AlignTop)
+        main_layout.addLayout(logo_layout)'''
+
+        # Title Label
         title_label = QLabel("Online Art Gallery")
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setFont(QFont("Inter", 15, QFont.Bold))
         title_label.setStyleSheet("color: #FBBF24;")
         main_layout.addWidget(title_label)
+
+        # Logo Section
+        logo_layout = QVBoxLayout()
+        self.setLayout(logo_layout)
+
+        # Create a QLabel
+        self.logo_label = QLabel()
+        self.logo_label.setAlignment(Qt.AlignCenter)  # Center the logo
+        logo_layout.addWidget(self.logo_label)
+        logo_layout.addWidget(self.logo_label)
+        main_layout.addLayout(logo_layout)
+
+        # Load the image and display it
+        # Replace 'logo.png' with your file path
+        self.upload_logo('C:\\Users\\Springrose\\Downloads\\Gemini_Generated_Image_2.png')
 
         # Image Display Area (Using QWebEngineView for better rendering)
         self.image_panel = QWebEngineView()
@@ -79,7 +102,7 @@ class ArtViewerApp(QMainWindow):
         # Adjusting the aspect ratio for portrait images
         self.image_panel.setMinimumSize(200, 400)
         self.image_panel.setMaximumSize(300, 500)
-        #self.image_panel.setStyleSheet("background-color: #2d3748; border-radius: 8px; padding: 10px;")
+        self.image_panel.setStyleSheet("background-color: #2d3748; border-radius: 8px; padding: 10px;")
         main_layout.addWidget(self.image_panel, alignment=Qt.AlignCenter)
 
         # Navigation and Status
@@ -89,7 +112,7 @@ class ArtViewerApp(QMainWindow):
         self.prev_button = self.create_button("<< Previous", self.previous_image, "#2563EB", "#1D4ED8")
         self.status_label = QLabel()
         self.status_label.setAlignment(Qt.AlignCenter)
-        self.status_label.setFont(QFont("Inter", 14))
+        self.status_label.setFont(QFont("Inter", 15))
         self.status_label.setStyleSheet("color: #a0aec0;")
         self.next_button = self.create_button("Next >>", self.next_image, "#2563EB", "#1D4ED8")
 
@@ -105,7 +128,7 @@ class ArtViewerApp(QMainWindow):
         bottom_layout = QHBoxLayout()
         bottom_layout.setAlignment(Qt.AlignCenter)
 
-        # Likes layout
+        # Likes Layout
         likes_layout = QVBoxLayout()
 
         # Like Button
@@ -127,7 +150,7 @@ class ArtViewerApp(QMainWindow):
 
         main_layout.addLayout(bottom_layout)
 
-        # Comments section
+        # Comments Section
         comments_layout = QVBoxLayout()
         comments_layout.setSpacing(5)
         comment_label = QLabel("Comments:")
@@ -161,7 +184,7 @@ class ArtViewerApp(QMainWindow):
     def create_button(text, command, color, hover_color):
         """Helper function to create styled buttons."""
         button = QPushButton(text)
-        button.setFixedSize(160, 45)
+        button.setFixedSize(140, 45)
         button.setFont(QFont("Inter", 12, QFont.Bold))
         button.clicked.connect(command)
 
@@ -185,13 +208,54 @@ class ArtViewerApp(QMainWindow):
         button.setStyleSheet(style)
         return button
 
+    '''def upload_logo(self):
+        """Opens a file dialog to allow the user to upload a logo."""
+        file_dialog = QFileDialog(self)
+        file_dialog.setWindowTitle("Select Logo File")
+        file_dialog.setNameFilter("Image Files (*.png *.jpg *.jpeg *.svg)")
+
+        if file_dialog.exec_():
+            selected_files = file_dialog.selectedFiles()
+            if selected_files:
+                file_path = selected_files[0]
+                pixmap = QPixmap()
+                if pixmap.load(file_path):
+                    scaled_pixmap = pixmap.scaled(self.logo_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                    self.logo_label.setPixmap(scaled_pixmap)
+                else:
+                    print("Error: The selected file is not a valid image.")'''
+
+    def upload_logo(self, image_path):
+        """Loads an image from a file and displays it in the QLabel."""
+        try:
+            # Create a QPixmap from the image file
+            pixmap = QPixmap(image_path)
+
+            # Check if the image loaded successfully
+            if pixmap.isNull():
+                print(f"Error: Unable to load image from {image_path}")
+                # You might want to display a placeholder or text instead
+                self.logo_label.setText("Image not found")
+                return
+
+            # Optionally, scale the image to fit the label
+            scaled_pixmap = pixmap.scaled(150, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.logo_label.setPixmap(scaled_pixmap)
+
+            # Set the QPixmap to the QLabel
+            self.logo_label.setPixmap(pixmap)
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            self.logo_label.setText("An error occurred")
+
     def display_image(self):
         """Displays the image at the current index and updates social data."""
         url = IMAGE_URLS[self.image_index]
         self.image_panel.setUrl(QUrl(url))
 
         # Image counter
-        self.status_label.setText(f"Image: {self.image_index + 1} of {len(IMAGE_URLS)}")
+        self.status_label.setText(f"{self.image_index + 1} of {len(IMAGE_URLS)}")
 
         # Update social features
         current_image_data = self.art_data.get(url, {"likes": 0, "comments": []})
