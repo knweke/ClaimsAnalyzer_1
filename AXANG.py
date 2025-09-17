@@ -11,13 +11,14 @@ from streamlit_option_menu import option_menu
 import base64
 import json
 import requests
+from fpdf import FPDF
 import os
 from xgboost.testing.data import joblib
 from ClaimsAppModel import pipeline
 
 filepath = 'C:\\Users\\Springrose\\Downloads\\FRAUD DETECTION\\Smart Claims Data.csv'
 
-df = pd.read_csv(filepath, encoding='latin-1')
+df = pd.read_csv(filepath, encoding='cp1252')
 pd.set_option('display.max_columns', None)
 #df.head()
 
@@ -94,6 +95,19 @@ def save_user(username, password):
     # Save the updated users list back to CSV
     users.to_csv("users.csv", index=False)
     return True
+
+# ---- PDF Generator ----
+def generate_pdf_report(data_summary):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=14)
+    pdf.cell(200, 10, txt="Claims Analysis Report", ln=True, align='C')
+    pdf.ln(10)
+    for line in data_summary:
+        pdf.multi_cell(0, 10, line)
+    filename = "claims_report.pdf"
+    pdf.output(filename)
+    return filename
 
 # ---- Sidebar: Login/Register ----
 st.sidebar.title("🔐 User Authentication")
@@ -186,6 +200,7 @@ if auth_success:
         # Extract year and month of policy inception
         df['policy_inception_year'] = df['Policy_Start_Date'].dt.year
         df['policy_inception_month'] = df['Policy_Start_Date'].dt.month
+        df['submission_delay_days'] = (df['Claim_Submission_Date'] - df['Incident_Date']).dt.days
 
         # Visualizing years of policy inception between 2022 to 2024
         st.subheader("Year on Year Chart by Policy Inception (2022-2024)")
@@ -390,7 +405,7 @@ selected_claim_amount = st.number_input('Enter claim amount (₦) :',
                                step=0.01,
                                format="%.2f")
 st.write("Claim amount entered : ₦", selected_claim_amount)
-selected_pn = st.selectbox("Policy ID :", options=policy_no)
+# selected_pn = st.selectbox("Policy ID :", options=policy_no)
 
 # Creating filters
 filtered_df = df.copy()
@@ -463,7 +478,7 @@ else:
 st.divider()
 
 # Create button to trigger prediction
-st.write(f"Note: Make sure you enter the selected claim details correctly. If otherwise, default claim prediction result is '0'.")
+st.write(f"Make sure you enter the selected claim details correctly. If otherwise, default prediction result will return '0'.")
 if st.button("View Prediction Result"):
     input_data = pd.DataFrame([{
         'Location' : selected_loc,
@@ -481,23 +496,24 @@ if st.button("View Prediction Result"):
     if selected_claim_amount == 0.00:
         st.info('Claim amount must be greater than 0. To get accurate prediction result, please enter selected claim details.')
 
-    # 'if' condition to predict if a claim is fraudulent (1) or not (0).
-    threshold = 300000
+    # Claim threshold
+    threshold = 400000
 
     # Default claim prediction result : '0'
     prediction = model.predict(input_data)[0]
     st.markdown(f"##### Claim prediction result : '{int(prediction)}'")
 
+    # Condition to predict if a claim is fraudulent (1) or not (0).
     # Initialize the prediction variable
     if prediction:
         if selected_claim_amount > threshold:
             st.warning(f"The claim amount of ₦{selected_claim_amount:,} is above the payment threshold of ₦{threshold:,} and is flagged as potentially fraudulent.")
         else:
-            st.info(f"The claim amount of ₦{selected_claim_amount:,} falls within the payment threshold.")
+            st.info(f"The claim amount of ₦{selected_claim_amount:,} falls within the payment threshold of ₦{threshold:,}.")
 
     if prediction == 1:
         st.error('⚠️ Fraud alert : Potentially fraudulent claim has been detected. Please, exercise due diligence.')
-        st.warning('❌ Remark : This claim transaction has been flagged as suspicious for further reviews.')
+        st.warning('❌ Remark : This claim transaction has been flagged as suspicious and requires further review.')
     else:
         st.success('✅ Claim transaction passed credibility check.')
         st.success('🔍 After careful analysis, transaction is presumed legitimate for approval and further processing.')
@@ -519,6 +535,7 @@ st.markdown("###### Document Review Section")
 review = st.text_area("Claim documentation remark(s) :")
 
 col1, col2, col3, col4, col5 = st.columns(5)
+
 with col1:
     if st.button("Approve"):
         st.success("Document Approved")
@@ -560,7 +577,7 @@ with st.form(key='claims_form'):
 
 if submit_button:
     #st.write(f"Location: {selected_loc}, Policy type: {selected_pt}, Claim type: {selected_ct}, Incident type: {selected_it}, Customer age: {selected_customer_age}, Customer gender: {selected_customer_gender}, Customer occupation: {selected_customer_occupation}, Claim status: {selected_claim_status}, Premium amount: {selected_premium_amount}, Claim amount: {selected_claim_amount}, Authorization: {claim_status_2}, Comment: {comment}, Current Status: {st.session_state.status}")
-    st.write(f"- Policy ID: {selected_pn}")
+    st.write(f"- Policy ID: {selected_policy_number}")
     st.write(f"- Location: {selected_loc}")
     st.write(f"- Policy type: {selected_pt}")
     st.write(f"- Claim type: {selected_ct}")
