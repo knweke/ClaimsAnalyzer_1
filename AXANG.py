@@ -313,9 +313,11 @@ else:
 
 st.divider()
 
-# Use a form to group input widgets and a submit button
+st.markdown('###### Select, filter and view claim data by Policy ID')
+
+# Use a form to group input widgets and a submit button # Option 1
 with st.form(key="claim_form"):
-    st.write("Enter a policy number manually to search and view claim details")
+    #st.write("Enter a policy number manually to search and view claim details")
     policy_number_input = st.text_input(
         "Policy Number :",
         help="e.g., POL6048764, POL7285232"
@@ -337,7 +339,7 @@ with st.form(key="claim_form"):
         else:
             st.error("Please enter a policy number to search.")
 
-# Get a list of unique policy numbers to use as options for the select box
+# Get a list of unique policy numbers to use as options for the select box # Option 2
 policy_numbers = sorted(df['Policy_Number'].unique())
 
 # Add a "Select All" or placeholder option for the select box
@@ -345,7 +347,7 @@ policy_numbers.insert(0, 'Select a policy...')
 
 # Create the select box widget
 selected_policy_number = st.selectbox(
-    "Select a policy number from the list to view claim details :",
+    "Select policy number from the list to view claim details",
     options=policy_numbers
 )
 
@@ -354,10 +356,38 @@ if selected_policy_number and selected_policy_number != 'Select a policy...':
     # Filter the DataFrame based on the user's selection
     filtered_df = df[df['Policy_Number'] == selected_policy_number]
 
-    st.success(f"Found {len(filtered_df)} claim(s) for Policy ID: **{selected_policy_number}**")
-    st.dataframe(filtered_df, use_container_width=True)
+    st.success(f"Found **{len(filtered_df)}** claim(s) for Policy ID: **{selected_policy_number}**")
+    #st.dataframe(filtered_df, use_container_width=True)
+#elif selected_policy_number == 'Select a policy...':
+    #st.info("View selected claim details")
+
+    # Display selected fields
+    selected_fields = filtered_df[['Customer_Name', 'Location', 'Policy_Type', 'Claim_Type', 'Incident_Type',
+                                   'Customer_Age', 'Customer_Gender', 'Customer_Occupation',
+                                   'Claim_Status', 'Premium_Amount', 'Claim_Amount', 'Incident_Date',
+                                   'Claim_Submission_Date', 'Policy_Start_Date', 'Policy_End_Date',
+                                   'Fraud_Flag']]
+    st.dataframe(selected_fields, use_container_width=True)
 elif selected_policy_number == 'Select a policy...':
-    st.info("View selected claim details")
+    st.info("View and extract selected claim details")
+
+# ############################################################################### # Option 3
+#if selected_policy_number:
+    # Filter data by policy number
+    #filtered_data = df[df["Policy_Number"] == selected_policy_number]
+
+    #if not filtered_data.empty:
+        #st.success("Policy found! Displaying selected fields:")
+
+        # Display selected fields
+        #selected_fields = filtered_data[['Location', 'Policy_Type', 'Claim_Type','Incident_Type',
+                                         #'Customer_Age', 'Customer_Gender', 'Customer_Occupation',
+                                         #'Claim_Status', 'Premium_Amount', 'Claim_Amount', 'Incident_Date',
+                                         #'Claim_Submission_Date', 'Policy_Start_Date', 'Policy_End_Date',
+                                         #'Fraud_Flag']]
+        #st.dataframe(selected_fields)
+    #else:
+        #st.error("No claims found for the entered policy number.")
 
 st.markdown("###### Select available options below to filter selected claim data for predictive analysis")
 
@@ -374,10 +404,10 @@ claim_status = list(df['Claim_Status'].unique())
 premium_amount = df['Premium_Amount']
 claim_amount = df['Claim_Amount']
 policy_no = list(df['Policy_Number'].unique())
-#incident_date = list(df['Incident_Date'])
-#claim_submission_date = list(df['Claim_Submission_Date'])
-#policy_start_date = list(df['Policy_Start_Date'])
-#policy_end_date = list(df['Policy_End_Date'])
+incident_date = list(df['Incident_Date'])
+claim_submission_date = list(df['Claim_Submission_Date'])
+policy_start_date = list(df['Policy_Start_Date'])
+policy_end_date = list(df['Policy_End_Date'])
 
 # Create the select boxes
 selected_loc = st.selectbox("Location :", options=location)
@@ -394,10 +424,10 @@ selected_premium_amount = st.number_input('Enter premium amount (₦) :',
                                step=0.01,
                                format="%.2f")
 st.write("Premium amount entered : ₦", selected_premium_amount)
-#selected_incident_date = st.date_input("Incident date :")
-#selected_claim_submission_date = st.date_input("Claim submission date :")
-#selected_policy_start_date = st.date_input("Policy start date :")
-#selected_policy_end_date = st.date_input("Policy end date :")
+selected_incident_date = st.date_input("Incident date :")
+selected_claim_submission_date = st.date_input("Claim submission date :")
+selected_policy_start_date = st.date_input("Policy start date :")
+selected_policy_end_date = st.date_input("Policy end date :")
 
 selected_claim_amount = st.number_input('Enter claim amount (₦) :',
                                min_value=0.00,
@@ -430,14 +460,14 @@ if selected_premium_amount:
     filtered_df = filtered_df[filtered_df['Premium_Amount'] == selected_premium_amount]
 if selected_claim_amount:
     filtered_df = filtered_df[filtered_df['Claim_Amount'] == selected_claim_amount]
-#if selected_incident_date != '--Select--':
-    #filtered_df = filtered_df[filtered_df['Incident_Type'] == selected_incident_date]
-#if selected_claim_submission_date != '--Select--':
-    #filtered_df = filtered_df[filtered_df['Claim_Submission_Date'] == selected_claim_submission_date]
-#if selected_policy_start_date != '--Select--':
-    #filtered_df = filtered_df[filtered_df['Policy_Start_Date'] == selected_policy_start_date]
-#if selected_policy_end_date != '--Select--':
-    #filtered_df = filtered_df[filtered_df['Policy_End_Date'] == selected_policy_end_date]
+if selected_incident_date != '--Select--':
+    filtered_df = filtered_df[filtered_df['Incident_Type'] == selected_incident_date]
+if selected_claim_submission_date != '--Select--':
+    filtered_df = filtered_df[filtered_df['Claim_Submission_Date'] == selected_claim_submission_date]
+if selected_policy_start_date != '--Select--':
+    filtered_df = filtered_df[filtered_df['Policy_Start_Date'] == selected_policy_start_date]
+if selected_policy_end_date != '--Select--':
+    filtered_df = filtered_df[filtered_df['Policy_End_Date'] == selected_policy_end_date]
 
 #st.divider()
 
@@ -446,16 +476,16 @@ if selected_claim_amount:
     #st.session_state.filter_button = True
     #st.dataframe(filtered_df)
 
-st.divider()
+#st.divider()
 
 # Filter claims data with policy number
-policy_number = df['Policy_Number'].unique()
-selected_id = st.selectbox(
-    "Select or enter policy number manually to filter customer claim data. This parameter selects a row from the table.",
-    policy_number)
-filtered_df = df[df['Policy_Number'] == selected_id]
-st.markdown('###### Filtered claim data by Policy ID :')
-st.dataframe(filtered_df)
+#policy_number = df['Policy_Number'].unique()
+#selected_id = st.selectbox(
+    #"Select or enter policy number manually to filter customer claim data. This parameter selects a row from the table.",
+    #policy_number)
+#filtered_df = df[df['Policy_Number'] == selected_id]
+#st.markdown('###### Filtered claim data by Policy ID :')
+#st.dataframe(filtered_df)
 
 st.divider()
 
@@ -478,7 +508,7 @@ else:
 st.divider()
 
 # Create button to trigger prediction
-st.write(f"Make sure to enter the selected claim details correctly. If otherwise, default prediction result will return '0'.")
+st.write(f"Make sure to enter selected claim details correctly. If otherwise, default prediction result will return '0'.")
 if st.button("View Prediction Result"):
     input_data = pd.DataFrame([{
         'Location' : selected_loc,
@@ -493,24 +523,33 @@ if st.button("View Prediction Result"):
         'Claim_Amount' : selected_claim_amount
         }])
 
-    if selected_claim_amount == 0.00:
-        st.info('Claim amount must be greater than 0. To get accurate prediction result, please enter selected claim details.')
+    #if selected_claim_amount == 0.00:
+        #st.info('Claim amount must be greater than 0. To get accurate prediction result, please enter selected claim details.')
 
     # Claim threshold
     threshold = 400000
 
     # Default claim prediction result : '0'
     prediction = model.predict(input_data)[0]
+
+    if selected_claim_amount == 0.00:
+        st.info('Claim amount must be greater than 0. Hence, prediction result could not be ascertained. To get accurate prediction result, please enter selected claim details.')
+    #else:
+        #if prediction == 0:
+            #st.info('Claim amount must be greater than 0. Hence, prediction result could not be ascertained. To get accurate prediction result, please enter selected claim details.')
+        #else:
+            #if prediction == 1:
+                #st.info('Claim amount must be greater than 0. Hence, prediction result could not be ascertained. To get accurate prediction result, please enter selected claim details.')'''
+
     st.markdown(f"##### Claim prediction result : '{int(prediction)}'")
 
     # Condition to predict if a claim is fraudulent (1) or not (0).
     # Initialize the prediction variable
-    if prediction:
-        if selected_claim_amount > threshold:
-            st.warning(f"The claim amount of ₦{selected_claim_amount:,} is above the payment threshold of ₦{threshold:,} and is flagged as potentially fraudulent.")
+    if selected_claim_amount > threshold:
+        st.warning(f"The claim amount of ₦**{selected_claim_amount:,}** is above the payment threshold of ₦**{threshold:,}**. It has been flagged as potentially fraudulent.")
     else:
         if selected_claim_amount < threshold:
-            st.info(f"The claim amount of ₦{selected_claim_amount:,} falls within the payment threshold of ₦{threshold:,}.")
+            st.info(f"The claim amount of ₦**{selected_claim_amount:,}** falls within the payout threshold of ₦**{threshold:,}**.")
 
     if prediction == 1:
         st.error('⚠️ Fraud alert : Potentially fraudulent claim has been detected. Please, exercise due diligence.')

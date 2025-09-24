@@ -24,7 +24,10 @@
     },
     "https://placehold.co/600x800/FF5733/FFFFFF?text=Abstract+Art": {
         "likes": 1,
-        "comments": []
+        "comments": [
+            "gghg",
+            "gfgh"
+        ]
     },
     "https://placehold.co/600x800/33FF57/FFFFFF?text=Landscape+Painting": {
         "likes": 15,
@@ -56,5 +59,6 @@
     "https://placehold.co/600x800/A1FF33/FFFFFF?text=Modern+Sculpture": {
         "likes": 1,
         "comments": []
-    }
+    },
+    "favorites": []
 }

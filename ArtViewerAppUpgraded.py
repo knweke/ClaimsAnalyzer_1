@@ -1,11 +1,14 @@
 import sys
 import json
 import os
-from PyQt5.QtWidgets import (QApplication, QMainWindow,
-                             QWidget, QVBoxLayout, QHBoxLayout,
-                             QPushButton, QLabel, QTextEdit, QSizePolicy)
-from PyQt5.QtGui import QFont, QColor, QPixmap
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QPushButton, QLabel, QTextEdit, QSizePolicy, QFileDialog, QDialog,
+    QLineEdit, QSplitter
+)
+from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import Qt, QUrl
+#QDesktopServices
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # Third-party libraries for new features
@@ -13,23 +16,23 @@ import qrcode
 from PIL import Image
 from io import BytesIO
 
-# Configuration and Data
+# --- Configuration and Data ---
 IMAGE_URLS = [
-    "https://naijasteed.blogspot.com/2025/09/art-7.html",
-    "https://placehold.co/600x800/33FF57/FFFFFF?text=Landscape+Painting",
-    "https://placehold.co/600x800/3357FF/FFFFFF?text=Digital+Illustration",
-    "https://placehold.co/600x800/FF33A1/FFFFFF?text=Portrait+Sketch",
-    "https://placehold.co/600x800/A1FF33/FFFFFF?text=Modern+Sculpture",
+    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhYhlCQzszAv8eii7IagNmJAawR1Rgx7QuSoFLjFMcYzWCD4E5n77y_9aaqiyrEUK4z8ZMZVWNSCgKczTRapVzO5SdO1YPYm_SNkwuNWOFSBCB43rjet5i_1PxI-hmc8xvJN7DsUJUFce-lx7NgJT55m0WYI8849clVviTbOB_B7tzyPCnpnr1g2iCg2zc/s1152/20250916_024609.jpg",
+    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhdA3wqtcToSqGhuhq1wOUfdRjCjc20tNQxXuIjFeT9pkrC4oD4tdJi1SB5VIrCAdIFbbHPlLIKTnAj18pSa8miIyKrkAq4Tji7kOHMQV4wEif8WFy7L_ZinYiaMr-uI7fRjyGr9GX09KkV2QvFUKkVGg8i8rQNTxWW57cYf9h1EHFo6zIV5zWAp7fexkU/s1024/20250916_024539.jpg",
+    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh4fzebUz9FpbUU-938nSUTOPWOt3ONbeZ3_xb9vQ4YbSj_jrtS4SRrLyJvlVTzdGsUSffLNNvX7QpqDaIb24FZlCIH7TEX4Ve3AjAO7S-2ufNwklf32KhIRn9R6lh4t_ABWkfUcL6RK1w-jrQlHWD-g54-P69inl4wIOtEYWPe1nkcKEGBQFBUCF6rUG8/s1024/20250916_024516.jpg",
+    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSLCBvOC74zhbm1Ohd1cZovn0Kqp5h6I7OapCs_rWhfWDR_TQIvlFH-aG9bkVvOHXEpIuW58CIoZN7caloahbugX4wMjzaWteWj6R12ICrvmmpaIGRMXM8s4ZEUYili6w4hhqf6kdu67wtnO161qsuKmI72Tnz6A1N3Ov7XZ7Anov0N-r4_nZQgwBzq3Y/s784/20250916_024407.jpg",
+    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhvTuAvV7oPz50vmZ3QawFxpzCdhYgMWRRNOeXwRY7yv1PHYhVa5SfkgHNx7g6tSbwQgYV_ccZbuiTgr7bdkF969AjZGeI3CEMrrNUzORUiCcT05u-Y4d262-8smH3Vn2Yqy9H6DfuOaO9qiYLv7mq77vJFTcEuq8YIgYZar2KoWwbgMhduGBQAxaJwEQ0/s1280/20250916_023950.jpg",
+    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEifcRFx0jr7rh-8UEevws6tuup1yLNWzoKn-5jZgNTQTb7AtrCqf5HDffuYDrjOnoYGPRi0JDAYBwPf8hynu13elqyYo9xwiW4Uvyf5JeFKvSAwqSYBAJRjbCgTvNW0dAIVxWGi95BNMJiDakedS8GVPcGH8ae4fGYS9su6_sM_wiXe0D4-Jj3FFema8eQ/s1280/20250916_024119.jpg"
 ]
 
 DATA_FILE = "art_data.json"
 
-
 class ArtViewerApp(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Jopper - A Colorful Art Viewer Inspired By AI")
-        self.setGeometry(100, 100, 300, 500)
+        self.setWindowTitle("Jopper - A Colorful Art Viewer Powered by AI")
+        self.setGeometry(100, 100, 1100, 1200)
         self.setStyleSheet("background-color: #1a202c; color: #e2e8f0;")
 
         self.image_index = 0
@@ -39,7 +42,7 @@ class ArtViewerApp(QMainWindow):
 
         self.setup_ui()
         self.display_image()
-        #self.update()
+        self.update()
 
     @staticmethod
     def load_art_data(self):
@@ -80,37 +83,112 @@ class ArtViewerApp(QMainWindow):
 
         main_layout = QHBoxLayout(main_widget)
         main_layout.setContentsMargins(23, 23, 23, 23)
-        main_layout.setSpacing(30)
+        main_layout.setSpacing(20)
 
-        '''# Title Label
-        title_layout = QVBoxLayout()
-        self.setLayout(title_layout)
-        title_label = QLabel("Online Art Gallery")
-        title_label.setAlignment(Qt.AlignTop)
-        title_label.setFont(QFont("Inter", 15, QFont.Bold))
-        title_label.setStyleSheet("color: #FBBF24;")
-        main_layout.addWidget(title_label)'''
+        # Splitter to resize panels #############################
+        splitter = QSplitter(Qt.Horizontal)
+        main_layout.addWidget(splitter)
+
+        # Left Container for Ads and Features ######################
+        left_container = QWidget()
+        left_container_layout = QVBoxLayout(left_container)
+        left_container_layout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
+
+        # Ad Panel ##############################
+        ad_panel = QWidget()
+        ad_panel_layout = QVBoxLayout(ad_panel)
+        self.ad_viewer = QWebEngineView()
+        self.ad_viewer.setHtml("""
+            <div style="font-family: Arial, sans-serif; background-color: #334155; color: #e2e8f0; padding: 10px; border-radius: 5px; text-align: center; height: 100%;">
+                <h3 style="color: #6ee7b7; font-size: 1.2em; margin: 0;">Sponsored</h3>
+                <p style="font-size: 0.9em;">Click to see our new offers!</p>
+                <div style="font-size: 0.7em; color: #94a3b8;">Ad by ExampleCo</div>
+            </div>
+        """)
+        ad_panel_layout.addWidget(self.ad_viewer)
+        ad_panel.setFixedSize(350, 200)
+        left_container_layout.addWidget(ad_panel)  ################## 1
+
+        ad_panel = QWidget()
+        ad_panel_layout = QVBoxLayout(ad_panel)
+        self.ad_viewer = QWebEngineView()
+        self.ad_viewer.setHtml("""
+            <div style="font-family: Arial, sans-serif; background-color: #334155; color: #e2e8f0; padding: 10px; border-radius: 5px; text-align: center; height: 100%;">
+                <h3 style="color: #6ee7b7; font-size: 1.2em; margin: 0;">Sponsored</h3>
+                <p style="font-size: 0.9em;">Click to see our new offers!</p>
+                <div style="font-size: 0.7em; color: #94a3b8;">Ad by ExampleCo</div>
+            </div>
+        """)
+        ad_panel_layout.addWidget(self.ad_viewer)
+        ad_panel.setFixedSize(350, 200)
+        left_container_layout.addWidget(ad_panel)  ################## 2
+
+        ad_panel = QWidget()
+        ad_panel_layout = QVBoxLayout(ad_panel)
+        self.ad_viewer = QWebEngineView()
+        self.ad_viewer.setHtml("""
+            <div style="font-family: Arial, sans-serif; background-color: #334155; color: #e2e8f0; padding: 10px; border-radius: 5px; text-align: center; height: 100%;">
+                <h3 style="color: #6ee7b7; font-size: 1.2em; margin: 0;">Sponsored</h3>
+                <p style="font-size: 0.9em;">Click to see our new offers!</p>
+                <div style="font-size: 0.7em; color: #94a3b8;">Ad by ExampleCo</div>
+            </div>
+        """)
+        ad_panel_layout.addWidget(self.ad_viewer)
+        ad_panel.setFixedSize(350, 200)
+        left_container_layout.addWidget(ad_panel)  ################## 3
 
         # --- Left Panel for New Features ---
         left_panel_layout = QVBoxLayout()
-        left_panel_layout.setAlignment(Qt.AlignTop)
+        left_panel_layout.setAlignment(Qt.AlignVCenter)
+        left_panel_layout.setSpacing(5)  # Reduced spacing between buttons
 
+        # Logo and Upload Button Section
+        '''logo_layout = QHBoxLayout()
+        self.logo_label = QLabel()
+        self.logo_label.setFixedSize(120, 120)
+        self.logo_label.setAlignment(Qt.AlignCenter)
+        self.logo_label.setStyleSheet("border-radius: 60px;")
+
+        upload_logo_button = self.create_button("Upload Logo", self.upload_logo, "#9F7AEA", "#805AD5")
+
+        logo_layout.addWidget(self.logo_label)
+        logo_layout.addWidget(upload_logo_button, alignment=Qt.AlignRight | Qt.AlignTop)
+
+        left_panel_layout.addLayout(logo_layout)'''
+
+        # Feature Buttons
         self.fullscreen_button = self.create_button("Toggle Fullscreen", self.toggle_fullscreen, "#4A5568", "#2D3748")
         self.view_favorites_button = self.create_button("View Favorites", self.toggle_favorites_view, "#667EEA",
                                                         "#4C51BF")
         self.back_to_gallery_button = self.create_button("Back to Gallery", self.toggle_favorites_view, "#F56565",
                                                          "#E53E3E")
-        self.back_to_gallery_button.hide()  # Initially hide this button
-        self.add_to_favorites_button = self.create_button("Add to Favorites ❤️", self.add_to_favorites, "#ECC94B",
+        self.back_to_gallery_button.hide()
+        self.add_to_favorites_button = self.create_button("Add to Favorites", self.add_to_favorites, "#ECC94B",
                                                           "#D69E2E")
-        self.share_button = self.create_button("Share via QR Code", self.share_qr_code, "#38B2AC", "#319795")
+        self.share_button = self.create_button("Share by QR Code", self.share_qr_code, "#38B2AC", "#319795")
+        twitter_button = self.create_button("Share on X", self.share_on_twitter, "#1DA1F2", "#0F799E")
+        facebook_button = self.create_button("Share on FB", self.share_on_facebook, "#4267B2", "#2B4373")
+        # Add to Favorites ❤
 
         left_panel_layout.addWidget(self.fullscreen_button)
         left_panel_layout.addWidget(self.view_favorites_button)
         left_panel_layout.addWidget(self.back_to_gallery_button)
         left_panel_layout.addWidget(self.add_to_favorites_button)
         left_panel_layout.addWidget(self.share_button)
-        left_panel_layout.addStretch()
+        left_panel_layout.addWidget(twitter_button)
+        left_panel_layout.addWidget(facebook_button)
+
+        # Social Media Buttons
+        #social_share_layout = QHBoxLayout()
+        #twitter_button = self.create_button("Share on X", self.share_on_twitter, "#1DA1F2", "#0F799E")
+        #facebook_button = self.create_button("Share on FB", self.share_on_facebook, "#4267B2", "#2B4373")
+
+        #social_share_layout.addWidget(twitter_button)
+        #social_share_layout.addSpacing(5) # Reduced spacing
+        #social_share_layout.addWidget(facebook_button)
+
+        #left_panel_layout.addLayout(social_share_layout)
+        #left_panel_layout.addStretch()
 
         # --- Right Panel for Gallery Content ---
         right_panel_layout = QVBoxLayout()
@@ -118,58 +196,42 @@ class ArtViewerApp(QMainWindow):
         right_panel_layout.setSpacing(8)
 
         # Logo Section
-        '''logo_layout = QVBoxLayout()
+        logo_layout = QVBoxLayout()
         self.setLayout(logo_layout)
 
         # Create a QLabel
         self.logo_label = QLabel()
         self.logo_label.setAlignment(Qt.AlignCenter)  # Center the logo
         logo_layout.addWidget(self.logo_label)
-        logo_layout.addWidget(self.logo_label)
         main_layout.addLayout(logo_layout)
+        logo_layout.addWidget(self.logo_label, alignment=Qt.AlignRight | Qt.AlignTop)
 
         # Load the image and display it
         # Replace 'logo.png' with your file path
-        self.upload_logo('C:\\Users\\Springrose\\Downloads\\Gemini_Generated_Image_2.png')'''
+        self.upload_logo('C:\\Users\\Springrose\\Downloads\\Gemini_Generated_Image_2.png')
 
-        # Logo and Title Section
-        logo_title_layout = QVBoxLayout()
-        self.setLayout(logo_title_layout)
-        self.logo_label = QLabel()
-        #self.logo_label.setFixedSize(150, 150)
-        self.logo_label.setAlignment(Qt.AlignTop)
-        self.logo_label.setStyleSheet("border-radius: 75px;")
+        # Right Panel (Main Gallery)
+        right_panel = QWidget()
+        right_panel_layout = QVBoxLayout(right_panel)
+        right_panel_layout.setAlignment(Qt.AlignCenter)
 
-        logo_title_layout.addWidget(self.logo_label)
-        #logo_layout.addWidget(self.logo_label)
-        logo_title_layout.addWidget(self.logo_label)
-        main_layout.addLayout(logo_title_layout)
-
-        upload_logo_button = self.create_button("Upload Logo", self.upload_logo, "#9F7AEA", "#805AD5")
-
-        #logo_title_layout.addWidget(self.logo_label)
-
+        # Title Label
         title_label = QLabel("Online Art Gallery")
         title_label.setAlignment(Qt.AlignCenter)
-        title_label.setFont(QFont("Inter", 15, QFont.Bold))
-        title_label.setStyleSheet("color: #FBBF24;")
+        title_label.setFont(QFont("Inter", 14, QFont.Bold))
+        title_label.setStyleSheet("color: #ECC94B;")
 
-        title_layout = QVBoxLayout()
-        title_layout.addWidget(title_label)
-        title_layout.addSpacing(-10)  # Reduce space between title and image
-
-        logo_title_layout.addLayout(title_layout)
-        logo_title_layout.addWidget(upload_logo_button, alignment=Qt.AlignRight | Qt.AlignTop)
-
-        #right_panel_layout.addLayout(logo_title_layout)
-        #right_panel_layout.setSpacing(8)  # Reduced spacing here
+        right_panel_layout.addWidget(self.logo_label)
+        right_panel_layout.addWidget(title_label)
+        right_panel_layout.setSpacing(5) # Reduced spacing
+        # right_panel_layout.addSpacing(-10) # Reduce space between title and image
 
         # Image Display Area (Using QWebEngineView for better rendering)
         self.image_panel = QWebEngineView()
         self.image_panel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.image_panel.setStyleSheet("border-radius: 5px; border: 2px solid #4a5568;")
-        self.image_panel.setMinimumSize(200, 400)
-        self.image_panel.setMaximumSize(300, 500)
+        self.image_panel.setMinimumSize(400, 500)
+        self.image_panel.setMaximumSize(400, 500)
         right_panel_layout.addWidget(self.image_panel, alignment=Qt.AlignCenter)
 
         # Navigation and Status
@@ -179,14 +241,14 @@ class ArtViewerApp(QMainWindow):
         self.prev_button = self.create_button("← Previous", self.previous_image, "#2563EB", "#1D4ED8")
         self.status_label = QLabel()
         self.status_label.setAlignment(Qt.AlignCenter)
-        self.status_label.setFont(QFont("Inter", 14))
+        self.status_label.setFont(QFont("Inter", 12)) # Reduced font size
         self.status_label.setStyleSheet("color: #a0aec0;")
         self.next_button = self.create_button("Next →", self.next_image, "#2563EB", "#1D4ED8")
 
         nav_layout.addWidget(self.prev_button)
-        nav_layout.addSpacing(40)
+        nav_layout.addSpacing(20)
         nav_layout.addWidget(self.status_label)
-        nav_layout.addSpacing(40)
+        nav_layout.addSpacing(20)
         nav_layout.addWidget(self.next_button)
 
         right_panel_layout.addLayout(nav_layout)
@@ -200,9 +262,9 @@ class ArtViewerApp(QMainWindow):
         exit_button = self.create_button("Exit App", self.exit_app, "#F56565", "#E53E3E")
 
         bottom_layout.addWidget(self.like_button)
-        bottom_layout.addSpacing(20)
+        bottom_layout.addSpacing(10)
         bottom_layout.addWidget(ad_button)
-        bottom_layout.addSpacing(20)
+        bottom_layout.addSpacing(10)
         bottom_layout.addWidget(exit_button)
 
         right_panel_layout.addLayout(bottom_layout)
@@ -210,18 +272,19 @@ class ArtViewerApp(QMainWindow):
         # Comments Section
         comments_layout = QVBoxLayout()
         comments_layout.setSpacing(5)
-        comment_label = QLabel("Comments")
-        comment_label.setFont(QFont("Inter", 12, QFont.Bold))
-        comment_label.setStyleSheet("color: #9f7aea;")
+        comment_label = QLabel("Comments:")
+        comment_label.setFont(QFont("Inter", 10, QFont.Bold))
+        comment_label.setStyleSheet("color: #ECC94B;")
 
         self.comment_display = QTextEdit()
         self.comment_display.setReadOnly(True)
         self.comment_display.setStyleSheet("background-color: #2d3748; border-radius: 8px; padding: 10px;")
+        self.comment_display.setMaximumHeight(50)
 
         self.comment_input = QTextEdit()
         self.comment_input.setPlaceholderText("Add a comment...")
         self.comment_input.setStyleSheet("background-color: #2d3748; border-radius: 8px; padding: 5px;")
-        self.comment_input.setMaximumHeight(50)
+        self.comment_input.setMaximumHeight(30)
 
         add_comment_button = self.create_button("Add Comment", self.add_comment, "#48BB78", "#38A169")
 
@@ -238,31 +301,36 @@ class ArtViewerApp(QMainWindow):
         main_layout.addLayout(left_panel_layout)
         main_layout.addLayout(right_panel_layout)
 
+        # Add the two panels to the splitter
+        splitter.addWidget(left_container)
+        splitter.addWidget(right_panel)
+        splitter.setSizes([300, 900])  # Initial sizes for the panels
+
     @staticmethod
     def create_button(text, command, color, hover_color):
         """Helper function to create styled buttons."""
         button = QPushButton(text)
-        button.setFixedSize(160, 45)
-        button.setFont(QFont("Inter", 12, QFont.Bold))
+        button.setFixedSize(120, 35)
+        button.setFont(QFont("Inter", 10, QFont.Bold))
         button.clicked.connect(command)
 
         style = f"""
-                    QPushButton {{
-                        background-color: {color};
-                        color: white;
-                        border: none;
-                        border-radius: 22px;
-                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                        transition: all 0.2s ease-in-out;
-                    }}
-                    QPushButton:hover {{
-                        background-color: {hover_color};
-                        transform: scale(1.05);
-                    }}
-                    QPushButton:pressed {{
-                        transform: scale(0.95);
-                    }}
-                """
+            QPushButton {{
+                background-color: {color};
+                color: white;
+                border: none;
+                border-radius: 17px;
+                box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+                transition: all 0.2s ease-in-out;
+            }}
+            QPushButton:hover {{
+                background-color: {hover_color};
+                transform: scale(1.05);
+            }}
+            QPushButton:pressed {{
+                transform: scale(0.95);
+            }}
+        """
         button.setStyleSheet(style)
         return button
 
@@ -320,7 +388,18 @@ class ArtViewerApp(QMainWindow):
 
         url = self.current_image_urls[self.image_index]
         self.image_panel.setUrl(QUrl(url))
-        self.status_label.setText(f"Image {self.image_index + 1} of {len(self.current_image_urls)}")
+        self.status_label.setText(f"{self.image_index + 1} of {len(self.current_image_urls)}")
+
+    #def display_images(self):
+        #url = self.IMAGE_URLS[self.image_index]  # Display images 2
+        #html_content = f"""
+        #<html>
+        #<body style="margin:0; padding:0; background-color: #2d3748; display:flex; justify-content:center; align-items:center; height:100vh;">
+            #<img src="{url}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius: 5px;">
+        #</body>
+        #</html>
+        #"""
+        #self.image_viewer.setHtml(html_content, QUrl("about:blank"))
 
         # Update social features
         current_image_data = self.art_data.get(url, {"likes": 0, "comments": []})
@@ -359,7 +438,7 @@ class ArtViewerApp(QMainWindow):
             self.save_art_data()
 
     @staticmethod
-    def watch_ad():
+    def watch_ad(self):
         """Simulates an ad view."""
         # For a real app, this would integrate with an ad network.
         print("Simulated ad request. A commercial would play now.")
@@ -448,8 +527,20 @@ class ArtViewerApp(QMainWindow):
 
         qr_dialog.exec_()
 
+    def share_on_twitter(self):
+        """Opens a web browser to share the current image on Twitter/X."""
+        url = self.current_image_urls[self.image_index]
+        share_url = f"https://twitter.com/intent/tweet?url={url}&text=Check%20out%20this%20amazing%20art!%20%23OnlineArtGallery"
+        #QDesktopServices.openUrl(QUrl(share_url))
+
+    def share_on_facebook(self):
+        """Opens a web browser to share the current image on Facebook."""
+        url = self.current_image_urls[self.image_index]
+        share_url = f"https://www.facebook.com/sharer/sharer.php?u={url}"
+        #QDesktopServices.openUrl(QUrl(share_url))
+
 if __name__ == "__main__":
-        app = QApplication(sys.argv)
-        viewer = ArtViewerApp()
-        viewer.show()
-        sys.exit(app.exec_())
+    app = QApplication(sys.argv)
+    viewer = ArtViewerApp()
+    viewer.show()
+    sys.exit(app.exec_())

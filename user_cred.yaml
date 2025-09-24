@@ -1,0 +1,19 @@
+credentials:
+  usernames:
+    knweke:
+      email: knweke@axamansard.com
+      name: Kenechukwu Nweke
+      password: abc # To be replaced with hashed password
+      is_email_verified: True
+    azachariyau:
+      email: azachariyau@axamansard.com
+      name: Abdulwahab Zachariyau
+      password: def # To be replaced with hashed password
+      s_email_verified: True
+cookie:
+  expiry_days: 30
+  key: random_signature_key # Must be string
+  name: random_cookie_name
+preauthorized:
+  emails:
+  - admin@axamansard.com
