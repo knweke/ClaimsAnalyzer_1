@@ -10,6 +10,7 @@ from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import Qt, QUrl
 #QDesktopServices
 from PyQt5.QtWebEngineWidgets import QWebEngineView
+from Image_URLs import IMAGE_URLS
 
 # Third-party libraries for new features
 import qrcode
@@ -17,21 +18,15 @@ from PIL import Image
 from io import BytesIO
 
 # --- Configuration and Data ---
-IMAGE_URLS = [
-    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhYhlCQzszAv8eii7IagNmJAawR1Rgx7QuSoFLjFMcYzWCD4E5n77y_9aaqiyrEUK4z8ZMZVWNSCgKczTRapVzO5SdO1YPYm_SNkwuNWOFSBCB43rjet5i_1PxI-hmc8xvJN7DsUJUFce-lx7NgJT55m0WYI8849clVviTbOB_B7tzyPCnpnr1g2iCg2zc/s1152/20250916_024609.jpg",
-    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhdA3wqtcToSqGhuhq1wOUfdRjCjc20tNQxXuIjFeT9pkrC4oD4tdJi1SB5VIrCAdIFbbHPlLIKTnAj18pSa8miIyKrkAq4Tji7kOHMQV4wEif8WFy7L_ZinYiaMr-uI7fRjyGr9GX09KkV2QvFUKkVGg8i8rQNTxWW57cYf9h1EHFo6zIV5zWAp7fexkU/s1024/20250916_024539.jpg",
-    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh4fzebUz9FpbUU-938nSUTOPWOt3ONbeZ3_xb9vQ4YbSj_jrtS4SRrLyJvlVTzdGsUSffLNNvX7QpqDaIb24FZlCIH7TEX4Ve3AjAO7S-2ufNwklf32KhIRn9R6lh4t_ABWkfUcL6RK1w-jrQlHWD-g54-P69inl4wIOtEYWPe1nkcKEGBQFBUCF6rUG8/s1024/20250916_024516.jpg",
-    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSLCBvOC74zhbm1Ohd1cZovn0Kqp5h6I7OapCs_rWhfWDR_TQIvlFH-aG9bkVvOHXEpIuW58CIoZN7caloahbugX4wMjzaWteWj6R12ICrvmmpaIGRMXM8s4ZEUYili6w4hhqf6kdu67wtnO161qsuKmI72Tnz6A1N3Ov7XZ7Anov0N-r4_nZQgwBzq3Y/s784/20250916_024407.jpg",
-    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhvTuAvV7oPz50vmZ3QawFxpzCdhYgMWRRNOeXwRY7yv1PHYhVa5SfkgHNx7g6tSbwQgYV_ccZbuiTgr7bdkF969AjZGeI3CEMrrNUzORUiCcT05u-Y4d262-8smH3Vn2Yqy9H6DfuOaO9qiYLv7mq77vJFTcEuq8YIgYZar2KoWwbgMhduGBQAxaJwEQ0/s1280/20250916_023950.jpg",
-    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEifcRFx0jr7rh-8UEevws6tuup1yLNWzoKn-5jZgNTQTb7AtrCqf5HDffuYDrjOnoYGPRi0JDAYBwPf8hynu13elqyYo9xwiW4Uvyf5JeFKvSAwqSYBAJRjbCgTvNW0dAIVxWGi95BNMJiDakedS8GVPcGH8ae4fGYS9su6_sM_wiXe0D4-Jj3FFema8eQ/s1280/20250916_024119.jpg"
-]
+
+IMAGE_URLS
 
 DATA_FILE = "art_data.json"
 
 class ArtViewerApp(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Jopper - A Colorful Art Viewer Powered by AI")
+        self.setWindowTitle("Jopper - A Colorful Art Viewer Powered by AI Arts")
         self.setGeometry(100, 100, 1100, 1200)
         self.setStyleSheet("background-color: #1a202c; color: #e2e8f0;")
 
@@ -103,6 +98,7 @@ class ArtViewerApp(QMainWindow):
                 <h3 style="color: #6ee7b7; font-size: 1.2em; margin: 0;">Sponsored</h3>
                 <p style="font-size: 0.9em;">Click to see our new offers!</p>
                 <div style="font-size: 0.7em; color: #94a3b8;">Ad by ExampleCo</div>
+                <a href="https://procato.com" target="_blank" style="color: #93c5fd;">Click to see more!</a>
             </div>
         """)
         ad_panel_layout.addWidget(self.ad_viewer)
@@ -117,6 +113,7 @@ class ArtViewerApp(QMainWindow):
                 <h3 style="color: #6ee7b7; font-size: 1.2em; margin: 0;">Sponsored</h3>
                 <p style="font-size: 0.9em;">Click to see our new offers!</p>
                 <div style="font-size: 0.7em; color: #94a3b8;">Ad by ExampleCo</div>
+                <a href="https://procato.com" target="_blank" style="color: #93c5fd;">Click to see more!</a>
             </div>
         """)
         ad_panel_layout.addWidget(self.ad_viewer)
@@ -131,13 +128,14 @@ class ArtViewerApp(QMainWindow):
                 <h3 style="color: #6ee7b7; font-size: 1.2em; margin: 0;">Sponsored</h3>
                 <p style="font-size: 0.9em;">Click to see our new offers!</p>
                 <div style="font-size: 0.7em; color: #94a3b8;">Ad by ExampleCo</div>
+                <a href="https://www.procato.com" target="_blank" style="color: #93c5fd;">Click to see more!</a>
             </div>
         """)
         ad_panel_layout.addWidget(self.ad_viewer)
         ad_panel.setFixedSize(350, 200)
         left_container_layout.addWidget(ad_panel)  ################## 3
 
-        # --- Left Panel for New Features ---
+        # Left Panel for New Features
         left_panel_layout = QVBoxLayout()
         left_panel_layout.setAlignment(Qt.AlignVCenter)
         left_panel_layout.setSpacing(5)  # Reduced spacing between buttons
@@ -178,19 +176,7 @@ class ArtViewerApp(QMainWindow):
         left_panel_layout.addWidget(twitter_button)
         left_panel_layout.addWidget(facebook_button)
 
-        # Social Media Buttons
-        #social_share_layout = QHBoxLayout()
-        #twitter_button = self.create_button("Share on X", self.share_on_twitter, "#1DA1F2", "#0F799E")
-        #facebook_button = self.create_button("Share on FB", self.share_on_facebook, "#4267B2", "#2B4373")
-
-        #social_share_layout.addWidget(twitter_button)
-        #social_share_layout.addSpacing(5) # Reduced spacing
-        #social_share_layout.addWidget(facebook_button)
-
-        #left_panel_layout.addLayout(social_share_layout)
-        #left_panel_layout.addStretch()
-
-        # --- Right Panel for Gallery Content ---
+        # Right Panel for Gallery Content
         right_panel_layout = QVBoxLayout()
         right_panel_layout.setContentsMargins(0, 0, 0, 0)
         right_panel_layout.setSpacing(8)
@@ -224,14 +210,13 @@ class ArtViewerApp(QMainWindow):
         right_panel_layout.addWidget(self.logo_label)
         right_panel_layout.addWidget(title_label)
         right_panel_layout.setSpacing(5) # Reduced spacing
-        # right_panel_layout.addSpacing(-10) # Reduce space between title and image
 
         # Image Display Area (Using QWebEngineView for better rendering)
         self.image_panel = QWebEngineView()
         self.image_panel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.image_panel.setStyleSheet("border-radius: 5px; border: 2px solid #4a5568;")
-        self.image_panel.setMinimumSize(400, 500)
-        self.image_panel.setMaximumSize(400, 500)
+        self.image_panel.setMinimumSize(350, 450)
+        self.image_panel.setMaximumSize(350, 450)
         right_panel_layout.addWidget(self.image_panel, alignment=Qt.AlignCenter)
 
         # Navigation and Status
@@ -334,23 +319,6 @@ class ArtViewerApp(QMainWindow):
         button.setStyleSheet(style)
         return button
 
-    '''def upload_logo(self):
-        """Opens a file dialog to allow the user to upload a logo."""
-        file_dialog = QFileDialog(self)
-        file_dialog.setWindowTitle("Select Logo File")
-        file_dialog.setNameFilter("Image Files (*.png *.jpg *.jpeg *.svg)")
-
-        if file_dialog.exec_():
-            selected_files = file_dialog.selectedFiles()
-            if selected_files:
-                file_path = selected_files[0]
-                pixmap = QPixmap()
-                if pixmap.load(file_path):
-                    scaled_pixmap = pixmap.scaled(self.logo_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                    self.logo_label.setPixmap(scaled_pixmap)
-                else:
-                    print("Error: The selected file is not a valid image.")'''
-
     def upload_logo(self, image_path):
         """Loads an image from a file and displays it in the QLabel."""
         try:
@@ -389,6 +357,15 @@ class ArtViewerApp(QMainWindow):
         url = self.current_image_urls[self.image_index]
         self.image_panel.setUrl(QUrl(url))
         self.status_label.setText(f"{self.image_index + 1} of {len(self.current_image_urls)}")
+
+        html_content = f"""
+        <html>
+        <body style="margin:0; padding:0; background-color: #2d3748; display:flex; justify-content:center; align-items:center; height:100vh;">
+            <img src="{url}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius: 5px;">
+        </body>
+        </html>
+        """
+        #self.ad_viewer.setHtml(html_content, QUrl("about:blank"))
 
     #def display_images(self):
         #url = self.IMAGE_URLS[self.image_index]  # Display images 2
@@ -537,7 +514,7 @@ class ArtViewerApp(QMainWindow):
         """Opens a web browser to share the current image on Facebook."""
         url = self.current_image_urls[self.image_index]
         share_url = f"https://www.facebook.com/sharer/sharer.php?u={url}"
-        #QDesktopServices.openUrl(QUrl(share_url))
+        QDesktopServices.openUrl(QUrl(share_url))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
