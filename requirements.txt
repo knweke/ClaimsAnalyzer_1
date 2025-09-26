@@ -60,7 +60,20 @@ iniconfig==2.1.0
 pluggy==1.6.0
 pygments
 PyQt5
-opencv-python
+opencv-python-headless
+QApplication
+QMainWindow
+QWidget
+QVBoxLayout
+QHBoxLayout
+QPushButton
+QLabel
+QTextEdit
+QSizePolicy
+QFileDialog
+QDialog
+QLineEdit
+QSplitter
 
 shap
 tqdm
