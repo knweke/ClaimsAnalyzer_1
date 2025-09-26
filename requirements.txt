@@ -60,4 +60,14 @@ iniconfig==2.1.0
 pluggy==1.6.0
 pygments
 PyQt5
-opencv_python
+opencv-python
+
+shap
+tqdm
+fastapi
+openai
+uvicorn
+sentence-transformers
+torch
+tensorflow
+keras
