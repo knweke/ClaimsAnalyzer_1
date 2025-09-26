@@ -3,8 +3,7 @@ import json
 import os
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QPushButton, QLabel, QTextEdit, QSizePolicy, QFileDialog, QDialog,
-    QLineEdit, QSplitter
+    QPushButton, QLabel, QTextEdit, QSizePolicy, QDialog, QSplitter
 )
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import Qt, QUrl
@@ -26,7 +25,7 @@ DATA_FILE = "art_data.json"
 class ArtViewerApp(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Jopper - A Colorful Art Viewer Powered by AI Arts")
+        self.setWindowTitle("Jopper - A Colorful Art Viewer Powered by AI Arts and More")
         self.setGeometry(100, 100, 1100, 1200)
         self.setStyleSheet("background-color: #1a202c; color: #e2e8f0;")
 
