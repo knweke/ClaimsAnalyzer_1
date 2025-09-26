@@ -5,15 +5,27 @@ credentials:
       name: Kenechukwu Nweke
       password: abc # To be replaced with hashed password
       is_email_verified: True
-    azachariyau:
-      email: azachariyau@axamansard.com
-      name: Abdulwahab Zachariyau
+    azakariyau:
+      email: azakariyau@axamansard.com
+      name: Abdulwahab Zakariyau
       password: def # To be replaced with hashed password
-      s_email_verified: True
+      is_email_verified: True
 cookie:
   expiry_days: 30
-  key: random_signature_key # Must be string
+  key: xyz # Must be string
   name: random_cookie_name
 preauthorized:
-  emails:
-  - admin@axamansard.com
+  emails: admin@axamansard.com
+oauth2: # Optional
+  google: # Follow instructions: https://developers.google.com/identity/protocols/oauth2
+    client_id: # To be filled
+    client_secret: # To be filled
+    redirect_uri: # URL to redirect to after OAuth2 authentication
+  microsoft: # Follow instructions: https://learn.microsoft.com/en-us/graph/auth-register-app-v2
+    client_id: # To be filled
+    client_secret: # To be filled
+    redirect_uri: # URL to redirect to after OAuth2 authentication
+    tenant_id: # To be filled
+pre-authorized: # Optional
+  emails: admin@axamansard.com
+api_key: # Optional - register to receive a free API key: https://stauthenticator.com
